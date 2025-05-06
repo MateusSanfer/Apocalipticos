@@ -1,7 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
+@import "tailwindcss";
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -28,7 +26,11 @@ a:hover {
 }
 
 body {
-  @apply bg-gray-900 text-white;
+  background-image: url(assets/banner1.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
   margin: 0;
   display: flex;
   place-items: center;
@@ -48,7 +50,7 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  
   cursor: pointer;
   transition: border-color 0.25s;
 }

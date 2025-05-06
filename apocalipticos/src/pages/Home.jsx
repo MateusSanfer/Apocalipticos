@@ -1,5 +1,7 @@
+import React from 'react';
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+// import logo from "../assets/logo_apocalipticos.png"
 
 export default function Home() {
   const [code, setCode] = useState("");
@@ -19,8 +21,8 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-lime-400 flex flex-col items-center justify-center px-4">
-      <h1 className="text-5xl font-bold text-center mb-4">💀 APOCALÍPTICOS 💥</h1>
+    <div className=" text-lime-400 flex flex-col items-center justify-center px-4">
+      {/* <img src={logo} alt="Banner Sem Logo" /> */}
       <p className="text-lg mb-8 text-center max-w-md">
         Sobreviva aos desafios mais absurdos com seus amigos. Ou beba tentando.
       </p>
@@ -31,13 +33,13 @@ export default function Home() {
       >
         Criar Sala
       </button>
-
       <div className="flex gap-2">
+
         <input
           value={code}
           onChange={(e) => setCode(e.target.value)}
           placeholder="Digite o código da sala"
-          className="p-2 rounded text-black"
+          className="p-2 rounded text-white bg-black"
         />
         <button
           onClick={handleJoinRoom}
