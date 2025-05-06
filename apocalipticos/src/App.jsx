@@ -1,32 +1,26 @@
-import { useEffect } from 'react';
-import React from 'react';
-import './App.css';
-import { auth, signInAnonymously } from "./firebase/config";
-import { criarSala } from "./firebase/rooms";
-
-import { BrowserRouter, Routes, Route } from 'react-router-dom'; // Importação correta
-
+import React from 'react'; // <-- NECESSÁRIO para usar JSX
+import { Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import Lobby from './pages/Lobby';
+import { useEffect, useState } from 'react';
+import { auth, signInAnonymously } from './firebase/config';
 
 function App() {
+  const [uid, setUid] = useState(null);
+
   useEffect(() => {
     signInAnonymously(auth)
       .then((userCredential) => {
-        console.log("Usuário logado anonimamente");
-        const uid = userCredential.user.uid;
-        criarSala(uid, "hardcore").then((codigo) => {
-          console.log("Sala criada com código:", codigo);
-        });
+        setUid(userCredential.user.uid);
       })
-      .catch((error) => console.error("Erro no login:", error));
+      .catch(console.error);
   }, []);
 
   return (
-    <BrowserRouter> {/* Envolvendo as rotas */}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/lobby/:codigo" element={<Lobby />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Home uid={uid} />} />
+      <Route path="/lobby/:codigo" element={<Lobby />} />
+    </Routes>
   );
 }
 

@@ -1,56 +1,182 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import CreateRoomModal from "./CreateRoomModal";
+import React, { useState, useEffect } from "react";
 
-export default function Home() {
-  const navigate = useNavigate();
-  const [code, setCode] = useState("");
-  const [showModal, setShowModal] = useState(false);
+const modos = [
+  { value: "facil", label: "Modo Fácil (Família)" },
+  { value: "normal", label: "Modo Normal" },
+  { value: "18", label: "Modo +18" },
+  { value: "dificil", label: "Modo Difícil" },
+];
 
-  const handleJoinRoom = () => {
-    if (code.trim()) navigate(`/lobby/${code.trim().toUpperCase()}`);
+const categoriasDisponiveis = [
+  "Desafios",
+  "Perguntas",
+  "Mímica",
+  "Bebidas",
+  "Aleatório",
+];
+
+function gerarCodigoSala() {
+  const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  return Array.from({ length: 5 }, () =>
+    letras[Math.floor(Math.random() * letras.length)]
+  ).join("");
+}
+
+function calcularIdade(dataNascimento) {
+  const hoje = new Date();
+  const nascimento = new Date(dataNascimento);
+  let idade = hoje.getFullYear() - nascimento.getFullYear();
+  const m = hoje.getMonth() - nascimento.getMonth();
+
+  if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
+    idade--;
+  }
+  return idade;
+}
+
+export default function CreateRoomModal({ isOpen, onClose, onCreate }) {
+  const [roomCode, setRoomCode] = useState("");
+  const [limiteJogadores, setLimiteJogadores] = useState(6);
+  const [modo, setModo] = useState("normal");
+  const [categorias, setCategorias] = useState([]);
+  const [nome, setNome] = useState("");
+  const [dataNascimento, setDataNascimento] = useState("");
+
+  useEffect(() => {
+    if (isOpen) {
+      setRoomCode(gerarCodigoSala());
+      setLimiteJogadores(6);
+      setModo("normal");
+      setCategorias([]);
+      setNome("");
+      setDataNascimento("");
+    }
+  }, [isOpen]);
+
+  const toggleCategoria = (cat) => {
+    setCategorias((prev) =>
+      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
+    );
   };
 
-  const handleCreateRoom = (roomData) => {
-    // Aqui você enviaria `roomData` para o Firebase
-    console.log("Criar Sala:", roomData);
-    navigate(`/lobby/${roomData.roomCode}`);
+  const handleSubmit = () => {
+    if (!nome || !dataNascimento) {
+      alert("Preencha seu nome e data de nascimento.");
+      return;
+    }
+
+    const idade = calcularIdade(dataNascimento);
+    if (idade < 18 && (modo === "18" || modo === "dificil")) {
+      alert("Modos +18 e Difícil não estão disponíveis para menores de idade.");
+      return;
+    }
+
+    const roomData = {
+      roomCode,
+      limiteJogadores,
+      modo,
+      categorias,
+      nomeAdmin: nome,
+      dataNascimento,
+    };
+    onCreate(roomData);
+    onClose();
   };
+
+  if (!isOpen) return null;
 
   return (
-    <div className="min-h-screen bg-black text-lime-400 flex flex-col items-center justify-center px-4">
-      <h1 className="text-5xl font-bold text-center mb-4">💀 APOCALÍPTICOS 💥</h1>
-      <p className="text-lg mb-8 text-center max-w-md">
-        Sobreviva aos desafios mais absurdos com seus amigos. Ou beba tentando.
-      </p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg">
+        <h2 className="text-2xl font-bold mb-4 text-center">Criar Sala</h2>
 
-      <button
-        onClick={() => setShowModal(true)}
-        className="bg-lime-500 text-black font-bold px-6 py-3 rounded-xl mb-6 hover:scale-105 transition"
-      >
-        Criar Sala
-      </button>
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">Seu nome:</label>
+          <input
+            type="text"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+            className="w-full p-2 rounded border"
+          />
+        </div>
 
-      <div className="flex gap-2">
-        <input
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          placeholder="Digite o código da sala"
-          className="p-2 rounded text-black"
-        />
-        <button
-          onClick={handleJoinRoom}
-          className="bg-yellow-400 px-4 rounded font-bold text-black"
-        >
-          Entrar
-        </button>
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">Data de nascimento:</label>
+          <input
+            type="date"
+            value={dataNascimento}
+            onChange={(e) => setDataNascimento(e.target.value)}
+            className="w-full p-2 rounded border"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">Código da Sala:</label>
+          <div className="bg-gray-100 p-2 rounded text-center font-mono text-lg">
+            {roomCode}
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">
+            Limite de Jogadores: {limiteJogadores}
+          </label>
+          <input
+            type="range"
+            min="2"
+            max="12"
+            value={limiteJogadores}
+            onChange={(e) => setLimiteJogadores(Number(e.target.value))}
+            className="w-full"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">Modo de Jogo:</label>
+          <select
+            value={modo}
+            onChange={(e) => setModo(e.target.value)}
+            className="w-full p-2 rounded border"
+          >
+            {modos.map((m) => (
+              <option key={m.value} value={m.value}>
+                {m.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-2">Categorias:</label>
+          <div className="grid grid-cols-2 gap-2">
+            {categoriasDisponiveis.map((cat) => (
+              <label key={cat} className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={categorias.includes(cat)}
+                  onChange={() => toggleCategoria(cat)}
+                />
+                {cat}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex justify-between mt-6">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          >
+            Criar
+          </button>
+        </div>
       </div>
-
-      <CreateRoomModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        onCreate={handleCreateRoom}
-      />
     </div>
   );
 }

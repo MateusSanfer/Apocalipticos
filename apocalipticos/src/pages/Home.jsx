@@ -1,63 +1,62 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { criarSala } from '../firebase/rooms';
-import CreateRoomModal from '../components/CreateRoomModal'; // Você vai criar esse modal
+import CreateRoomModal from "../components/CreateRoomModal";
+import JoinRoomModal from "../components/JoinRoomModal";
+import { criarSala } from "../firebase/rooms";
 
 export default function Home({ uid }) {
   const navigate = useNavigate();
-  const [code, setCode] = useState("");
-  const [showModal, setShowModal] = useState(false);
-
-  const handleJoinRoom = () => {
-    if (code.trim()) {
-      navigate(`/lobby/${code.trim().toUpperCase()}`);
-    }
-  };
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState(false);
 
   const handleCreateRoom = async (roomData) => {
     if (!uid) return;
     const codigo = await criarSala(uid, roomData);
     navigate(`/lobby/${codigo}`);
   };
+  const handleJoinRoomModal = ({ nome, nascimento, chave }) => {
+    // Exemplo: salvar no localStorage
+    localStorage.setItem("playerName", nome);
+    localStorage.setItem("birthDate", nascimento);
+    navigate(`/lobby/${chave}`);
+  };
+  
 
   if (!uid) {
-    return <div className="text-white text-center mt-10">Carregando...</div>;
+    return <div className="text-white text-center mt-20">Carregando...</div>;
   }
 
   return (
-    <div className="min-h-screen bg-black text-lime-400 flex flex-col items-center justify-center px-4">
-      <h1 className="text-5xl font-bold text-center mb-4">💀 APOCALÍPTICOS 💥</h1>
-      <p className="text-lg mb-8 text-center max-w-md">
-        Sobreviva aos desafios mais absurdos com seus amigos. Ou beba tentando.
-      </p>
+    <div className="min-h-screen flex flex-col items-center justify-center text-center text-black">
+      <h1 className="text-4xl font-bold text-lime-400 mb-10 flex items-center gap-2">
+        <span role="img" aria-label="skull">💀</span> Apocalípticos!
+      </h1>
 
       <button
-        onClick={() => setShowModal(true)}
-        className="bg-orange-600 hover:bg-orange-800 px-6 py-3 rounded-xl font-bold mb-6"
+        onClick={() => setShowCreateModal(true)}
+        className="bg-lime-500 text-black font-bold px-6 py-3 rounded-xl mb-6 hover:scale-105 transition"
       >
         Criar Sala
       </button>
 
-      <div className="flex gap-2">
-        <input
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          placeholder="Digite o código da sala"
-          className="text-black px-4 py-2 rounded"
-        />
-        <button
-          onClick={handleJoinRoom}
-          className="bg-green-600 hover:bg-green-800 px-4 py-2 rounded text-white font-bold"
-        >
-          Entrar
-        </button>
-      </div>
+      <button
+        onClick={() => setShowJoinModal(true)}
+        className="bg-yellow-400 text-black font-bold px-6 py-3 rounded-xl hover:scale-105 transition"
+      >
+        Entrar na Sala
+      </button>
 
       <CreateRoomModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
         onCreate={handleCreateRoom}
       />
+
+<JoinRoomModal
+  isOpen={showJoinModal}
+  onClose={() => setShowJoinModal(false)}
+  onJoin={handleJoinRoomModal}
+/>
     </div>
   );
 }

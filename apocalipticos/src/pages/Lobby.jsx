@@ -2,7 +2,6 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { db } from "../firebase/config";
 import { doc, onSnapshot, collection } from "firebase/firestore";
-import { BrowserRouter, Routes, Rout } from 'react-router-dom';
 export default function Lobby() {
   const { codigo } = useParams(); // Recebe código da sala da URL
   const [sala, setSala] = useState(null);
@@ -51,7 +50,7 @@ export default function Lobby() {
           <ul className="space-y-1">
             {jogadores.map((jogador, i) => (
               <li key={i} className="bg-gray-900 py-1 rounded">
-                {jogador.nome || Anônimo ${i + 1}}
+                {jogador.nome || `Anônimo ${i + 1}`}
               </li>
             ))}
           </ul>
