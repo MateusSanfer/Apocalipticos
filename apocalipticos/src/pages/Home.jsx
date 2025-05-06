@@ -11,11 +11,17 @@ export default function Home({ uid }) {
 
   const handleCreateRoom = async (roomData) => {
     if (!uid) return;
-    const codigo = await criarSala(uid, roomData);
-    navigate(`/lobby/${codigo}`);
+    try {
+      const codigo = await criarSala(uid, roomData);
+      console.log("Código da sala criada:", codigo);
+      navigate(`/lobby/${codigo}`);
+    } catch (err) {
+      console.error("Erro ao criar sala:", err);
+    }
   };
+  
   const handleJoinRoomModal = ({ nome, nascimento, chave }) => {
-    // Exemplo: salvar no localStorage
+    // salvar no localStorage
     localStorage.setItem("playerName", nome);
     localStorage.setItem("birthDate", nascimento);
     navigate(`/lobby/${chave}`);
@@ -27,13 +33,36 @@ export default function Home({ uid }) {
   }
 
   return (
-    <div id="buttonHome" className="text-center mt-10 text-white">
-    <h4>Sobreviva aos desafios mais absurdos com seus amigos. Ou beba tentando.</h4>
-   
+    <div id="home" className="min-h-screen flex flex-col items-center justify-center text-center text-black">
+      <h1 className="mb-10 flex items-center gap-2">
+        <span role="img" aria-label="skull"></span> Sobreviva aos desafios mais absurdos com seus amigos. Ou beba tentando.
+      </h1>
 
-   
-      <button onClick={() => setModalCriarSalaAberto(true)}>Criar Sala</button>
-<button onClick={() => setModalEntrarSalaAberto(true)}>Entrar na Sala</button>
+      <button
+        onClick={() => setShowCreateModal(true)}
+        className="bg-lime-500 text-black font-bold px-6 py-3 rounded-xl mb-6 hover:scale-105 transition"
+      >
+        Criar Sala
+      </button>
+
+      <button
+        onClick={() => setShowJoinModal(true)}
+        className="bg-yellow-400 text-black font-bold px-6 py-3 rounded-xl hover:scale-105 transition"
+      >
+        Entrar na Sala
+      </button>
+
+      <CreateRoomModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreate={handleCreateRoom}
+      />
+
+<JoinRoomModal
+  isOpen={showJoinModal}
+  onClose={() => setShowJoinModal(false)}
+  onJoin={handleJoinRoomModal}
+/>
     </div>
   );
 }

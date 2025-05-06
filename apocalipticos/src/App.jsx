@@ -19,7 +19,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Home uid={uid} />} />
-      <Route path="/lobby/:codigo" element={<Lobby />} />
+      <Route path="/lobby/:codigo" element={<Lobby uid={uid} />} />
     </Routes>
   );
 }

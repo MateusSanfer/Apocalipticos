@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 
+const emojis = ["🧟‍♂️", "☢", "☣", "🪓", "🍺", "💥", "👽", "🧨", "🎯", "🔪"];
+
 export default function JoinRoomModal({ isOpen, onClose, onJoin }) {
   const [nome, setNome] = useState("");
   const [nascimento, setNascimento] = useState("");
   const [chave, setChave] = useState("");
+  const [avatar, setAvatar] = useState("");
   const [erro, setErro] = useState("");
 
   useEffect(() => {
@@ -11,6 +14,7 @@ export default function JoinRoomModal({ isOpen, onClose, onJoin }) {
       setNome("");
       setNascimento("");
       setChave("");
+      setAvatar("");
       setErro("");
     }
   }, [isOpen]);
@@ -27,8 +31,8 @@ export default function JoinRoomModal({ isOpen, onClose, onJoin }) {
   };
 
   const handleJoin = () => {
-    if (!nome || !nascimento || !chave) {
-      setErro("Preencha todos os campos.");
+    if (!nome || !nascimento || !chave || !avatar) {
+      setErro("Preencha todos os campos e selecione um avatar.");
       return;
     }
 
@@ -38,8 +42,20 @@ export default function JoinRoomModal({ isOpen, onClose, onJoin }) {
       return;
     }
 
+    const jogador = {
+      nome,
+      nascimento,
+      avatar,
+      chave: chave.trim().toUpperCase(),
+    };
+
+    // Salvar no localStorage
+    localStorage.setItem("playerName", nome);
+    localStorage.setItem("birthDate", nascimento);
+    localStorage.setItem("avatar", avatar);
+
     setErro("");
-    onJoin({ nome, nascimento, chave: chave.trim().toUpperCase() });
+    onJoin(jogador);
     onClose();
   };
 
@@ -53,7 +69,7 @@ export default function JoinRoomModal({ isOpen, onClose, onJoin }) {
         {erro && <p className="text-red-500 text-sm text-center mb-2">{erro}</p>}
 
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Seu Nome:</label>
+          <label className="block text-sm font-medium mb-1">Apelido:</label>
           <input
             type="text"
             value={nome}
@@ -71,6 +87,23 @@ export default function JoinRoomModal({ isOpen, onClose, onJoin }) {
             onChange={(e) => setNascimento(e.target.value)}
             className="w-full p-2 border rounded"
           />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">Avatar (Emoji):</label>
+          <div className="grid grid-cols-5 gap-2">
+            {emojis.map((e) => (
+              <button
+                key={e}
+                onClick={() => setAvatar(e)}
+                className={`text-2xl p-2 rounded border ${
+                  avatar === e ? "bg-green-200 border-green-500" : "hover:bg-gray-100"
+                }`}
+              >
+                {e}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="mb-6">
