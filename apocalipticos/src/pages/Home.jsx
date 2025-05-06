@@ -15,7 +15,7 @@ export default function Home({ uid }) {
     navigate(`/lobby/${codigo}`);
   };
   const handleJoinRoomModal = ({ nome, nascimento, chave }) => {
-    // Exemplo: salvar no localStorage
+    // salvar no localStorage
     localStorage.setItem("playerName", nome);
     localStorage.setItem("birthDate", nascimento);
     navigate(`/lobby/${chave}`);
