@@ -11,9 +11,15 @@ export default function Home({ uid }) {
 
   const handleCreateRoom = async (roomData) => {
     if (!uid) return;
-    const codigo = await criarSala(uid, roomData);
-    navigate(`/lobby/${codigo}`);
+    try {
+      const codigo = await criarSala(uid, roomData);
+      console.log("Código da sala criada:", codigo);
+      navigate(`/lobby/${codigo}`);
+    } catch (err) {
+      console.error("Erro ao criar sala:", err);
+    }
   };
+  
   const handleJoinRoomModal = ({ nome, nascimento, chave }) => {
     // salvar no localStorage
     localStorage.setItem("playerName", nome);
@@ -27,9 +33,9 @@ export default function Home({ uid }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center text-center text-black">
-      <h1 className="text-4xl font-bold text-lime-400 mb-10 flex items-center gap-2">
-        <span role="img" aria-label="skull">💀</span> Apocalípticos!
+    <div id="home" className="min-h-screen flex flex-col items-center justify-center text-center text-black">
+      <h1 className="mb-10 flex items-center gap-2">
+        <span role="img" aria-label="skull"></span> Sobreviva aos desafios mais absurdos com seus amigos. Ou beba tentando.
       </h1>
 
       <button

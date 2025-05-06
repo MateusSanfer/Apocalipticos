@@ -64,23 +64,23 @@ export default function CreateRoomModal({ isOpen, onClose, onCreate }) {
       alert("Preencha seu nome e data de nascimento.");
       return;
     }
-
+  
     const idade = calcularIdade(dataNascimento);
     if (idade < 18 && (modo === "18" || modo === "dificil")) {
       alert("Modos +18 e Difícil não estão disponíveis para menores de idade.");
       return;
     }
-
+  
     const roomData = {
       roomCode,
       limiteJogadores,
-      modo,
-      categorias,
+      modo: String(modo), // 🔒 Garantir que é string
+      categorias: Array.isArray(categorias) ? categorias : [], // 🔒 Garantir que é array de strings
       nomeAdmin: nome,
       dataNascimento,
     };
-    onCreate(roomData);
-    onClose();
+  
+    onCreate(roomData); // Aqui quem salva no Firestore deve manter os tipos simples!
   };
 
   if (!isOpen) return null;

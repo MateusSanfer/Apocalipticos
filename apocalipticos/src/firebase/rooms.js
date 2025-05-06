@@ -1,21 +1,25 @@
-import { db } from "./config";
-import { collection, doc, setDoc } from "firebase/firestore";
-import { generateRoomCode } from "../utils/generateRoomCode";
+// firebase/rooms.js
 
-export async function criarSala(hostUid, modo) {
-  const codigo = generateRoomCode();
-  const salaRef = doc(collection(db, "salas"), codigo);
+import { db } from "./config";
+import { doc, setDoc } from "firebase/firestore";
+
+export async function criarSala(uid, roomData) {
+  const salaRef = doc(db, "salas", roomData.roomCode);
 
   const sala = {
-    codigo,
-    hostUid,
-    modo,
-    criadoEm: new Date().toISOString(),
+    roomCode: roomData.roomCode,
+    limiteJogadores: roomData.limiteJogadores,
+    modo: roomData.modo, // <-- string ("normal", "18", etc)
+    categorias: roomData.categorias, // <-- array de strings
+    nomeAdmin: roomData.nomeAdmin,
+    dataNascimento: roomData.dataNascimento,
+    hostUid: uid,
     estado: "lobby",
+    criadoEm: new Date().toISOString(),
     jogadores: {
-      [hostUid]: {
-        apelido: "Jogador 1",
-        avatar: "☣️",
+      [uid]: {
+        apelido: roomData.nomeAdmin,
+        avatar: "☣️", // você pode personalizar
         cumpriu: 0,
         recusou: 0,
       },
@@ -23,6 +27,5 @@ export async function criarSala(hostUid, modo) {
   };
 
   await setDoc(salaRef, sala);
-
-  return codigo;
+  return roomData.roomCode;
 }
