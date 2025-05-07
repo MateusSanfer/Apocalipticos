@@ -50,6 +50,17 @@ export default function Home({ uid }) {
     }
   };
   
+  const calcularIdade = (data) => {
+    const nascimento = new Date(data);
+    const hoje = new Date();
+    let idade = hoje.getFullYear() - nascimento.getFullYear();
+    const m = hoje.getMonth() - nascimento.getMonth();
+    if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
+      idade--;
+    }
+    return idade;
+  };
+  
 
   if (!uid) {
     return <div className="text-white text-center mt-20">Carregando...</div>;

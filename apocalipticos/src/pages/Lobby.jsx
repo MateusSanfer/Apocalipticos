@@ -105,9 +105,9 @@ const handleIniciarJogo = async () => {
 
      {isAdmin && (
         <button
-          className="bg-orange-600 hover:bg-orange-800 text-white font-bold py-2 px-6 rounded disabled:"
-          disabled={jogadores.length < 2}
-          onClick={() => alert("Jogo iniciado!")}
+        className="mt-6 bg-orange-600 hover:bg-orange-800 text-white font-bold py-2 px-6 rounded disabled"
+        disabled={jogadores.length < 2}
+        onClick={handleIniciarJogo}
         >
           Iniciar Jogo
         </button>
