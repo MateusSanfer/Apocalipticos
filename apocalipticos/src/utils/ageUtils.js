@@ -78,7 +78,7 @@ export function validateMinimumAge(birthDate, minAge) {
  * Formata idade para exibição
  * @param {number} age - Idade em anos
  * @returns {string} Idade formatada (ex: "25 anos")
- * @throws {Error} Se a idade for negativa
+ * @throws {Error} Se a idade for negativa.
  */
 export function formatAge(age) {
   if (age < 0) {
