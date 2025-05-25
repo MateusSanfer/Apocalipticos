@@ -1,21 +1,49 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, signInAnonymously } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { getAnalytics } from "firebase/analytics";
+import { 
+  getAuth, 
+  signInAnonymously, 
+  onAuthStateChanged,
+  connectAuthEmulator 
+} from "firebase/auth";
+import { 
+  getFirestore, 
+  connectFirestoreEmulator 
+} from "firebase/firestore";
+import { getAnalytics, isSupported } from "firebase/analytics";
 
-export { auth, signInAnonymously, db };
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAVS_gb4f31FKb0jY11U-w7PmIVBxmaNxc",
-    authDomain: "apocalipticos-ab93c.firebaseapp.com",
-    projectId: "apocalipticos-ab93c",
-    storageBucket: "apocalipticos-ab93c.firebasestorage.app",
-    messagingSenderId: "889560921943",
-    appId: "1:889560921943:web:a6e8bef2bb66cd613fb012",
-    measurementId: "G-XB7ND9CH0L"
-  };
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+};
 
+// Inicialização
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const analytics = getAnalytics(app);
+
+// Emuladores para desenvolvimento
+// if (import.meta.env.DEV) {
+//   connectAuthEmulator(auth, "http://localhost:9099");
+//   connectFirestoreEmulator(db, "localhost", 8080);
+// }
+
+// Analytics condicional (não quebra em desenvolvimento)
+let analytics;
+isSupported().then((supported) => {
+  if (supported) analytics = getAnalytics(app);
+});
+
+// Exportações organizadas
+export { 
+  auth,
+  db,
+  analytics,
+  signInAnonymously,
+  onAuthStateChanged 
+};
