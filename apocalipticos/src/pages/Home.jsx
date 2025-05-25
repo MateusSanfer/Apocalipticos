@@ -1,102 +1,189 @@
-import React, { useState } from "react";
+import React from "react"; // Adicione esta linha
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import CreateRoomModal from "../components/CreateRoomModal";
-import JoinRoomModal from "../components/JoinRoomModal";
 import { criarSala } from "../firebase/rooms";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "../firebase/config"; // ajuste o caminho se necessário
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../firebase/config";
+import { GAME_MODES } from "../constants/constants";
+import { parseBirthDate, calculateAge, validateMinimumAge } from "../utils/ageUtils";
+import MainButton from "../components/buttons/MainButton";
+import CreateRoomModal from "../components/modals/CreateRoomModal";
+import JoinRoomModal from "../components/modals/JoinRoomModal";
+import AgeVerificationModal from "../components/modals/AgeVerificationModal";
+import { useAuth } from "../context/AuthContext";
 
-export default function Home({ uid }) {
+
+export default function Home() {
+  const { currentUser, logout, loading } = useAuth();
+  const [modals, setModals] = useState({
+    create: false,
+    join: false,
+    ageRestricted: false,
+  });
+  const [ageError, setAgeError] = useState(null);
   const navigate = useNavigate();
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showJoinModal, setShowJoinModal] = useState(false);
 
   const handleCreateRoom = async (roomData) => {
-    if (!uid) return;
     try {
-      const codigo = await criarSala(uid, roomData);
-      console.log("Código da sala criada:", codigo);
+      if (!currentUser) {
+        alert("Você precisa estar logado para criar uma sala");
+        return;
+      }
+
+      if ([GAME_MODES.ADULTO, GAME_MODES.DIFICIL].includes(roomData.modo)) {
+        if (!validateMinimumAge(roomData.dataNascimento, 18)) {
+          setAgeError(`Modo ${roomData.modo} requer 18+ anos`);
+          setModals({ ...modals, ageRestricted: true });
+          return;
+        }
+      }
+
+      const codigo = await criarSala(currentUser.uid, {
+        ...roomData,
+        categorias: roomData.categorias || [],
+        criador: currentUser.displayName || currentUser.email,
+      });
       navigate(`/lobby/${codigo}`);
     } catch (err) {
       console.error("Erro ao criar sala:", err);
+      alert("Falha ao criar sala. Tente novamente.");
     }
   };
-  
-  const handleJoinRoomModal = async ({ nome, nascimento, avatar, chave }) => {
-    const uid = crypto.randomUUID(); // ou use uid do Firebase Auth, se quiser login futuro
-  
-    const idade = calcularIdade(nascimento);
-    const jogador = {
-      nome,
-      avatar,
-      idade,
-      uid,
-      timestamp: serverTimestamp(),
-    };
-  
-    try {
-      await setDoc(doc(db, "salas", chave, "jogadores", uid), jogador);
-  
-      // salvar no localStorage para uso no Lobby
-      localStorage.setItem("uid", uid);
-      localStorage.setItem("playerName", nome);
-      localStorage.setItem("birthDate", nascimento);
-      localStorage.setItem("avatar", avatar);
-  
-      navigate(`/lobby/${chave}`);
-    } catch (err) {
-      console.error("Erro ao entrar na sala:", err);
-      alert("Erro ao entrar na sala.");
-    }
-  };
-  
-  const calcularIdade = (data) => {
-    const nascimento = new Date(data);
-    const hoje = new Date();
-    let idade = hoje.getFullYear() - nascimento.getFullYear();
-    const m = hoje.getMonth() - nascimento.getMonth();
-    if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
-      idade--;
-    }
-    return idade;
-  };
+
   
 
-  if (!uid) {
-    return <div className="text-white text-center mt-20">Carregando...</div>;
+const handleJoinRoom = async (joinData) => {
+  try {
+    if (!currentUser) {
+      alert("Você precisa estar logado para entrar em uma sala");
+      return;
+    }
+
+    console.log("joinData.dataNascimento", joinData.dataNascimento);
+
+    const salaRef = doc(db, "salas", joinData.chave);
+    const salaSnap = await getDoc(salaRef);
+
+    if (salaSnap.exists()) {
+      const sala = salaSnap.data();
+
+      try {
+        if ([GAME_MODES.ADULTO, GAME_MODES.DIFICIL].includes(sala.modo)) {
+          if (!validateMinimumAge(joinData.dataNascimento, 18)) {
+            setAgeError("Esta sala é restrita para maiores de 18 anos");
+            setModals({ ...modals, ageRestricted: true });
+            return;
+          }
+        }
+      } catch {
+        alert("Data de nascimento inválida");
+        return;
+      }
+
+      const nascimentoDate = parseBirthDate(joinData.dataNascimento);
+      const nascimentoFormatado = nascimentoDate.toISOString().split("T")[0];
+
+      const jogador = {
+        nome: joinData.nome,
+        avatar: joinData.avatar || "👤",
+        idade: calculateAge(nascimentoFormatado),
+        uid: currentUser.uid,
+        email: currentUser.email,
+        timestamp: serverTimestamp(),
+      };
+
+      await setDoc(doc(db, "salas", joinData.chave, "jogadores", currentUser.uid), jogador);
+      localStorage.setItem("playerData", JSON.stringify(jogador));
+      navigate(`/lobby/${joinData.chave}`);
+    } else {
+      alert("Sala não encontrada!");
+    }
+  } catch (err) {
+    console.error("Erro ao entrar na sala:", err);
+    alert("Sala não encontrada ou código inválido.");
+  }
+};
+
+
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="text-white text-xl">Carregando...</div>
+      </div>
+    );
   }
 
   return (
-    <div id="home" className="min-h-screen flex flex-col items-center justify-center text-center text-black">
-      <h1 className="mb-10 flex items-center gap-2">
-        <span role="img" aria-label="skull"></span> Sobreviva aos desafios mais absurdos com seus amigos. Ou beba tentando.
-      </h1>
+    <div className="min-h-screen flex flex-col items-center justify-center text-white p-4">
+      <header className="mb-8 text-center">
+        <img
+          src="/logo_apocalipticos.png"
+          alt="Logo Apocalípticos"
+          className="mx-auto mb-4 max-w-[200px] w-full h-auto"
+        />
+        <h1 className="text-4xl font-bold mb-2">Apocalípticos🥶</h1>
+        <p className="text-lg">
+          Sobreviva aos desafios mais absurdos com seus amigos
+        </p>
+      </header>
 
-      <button
-        onClick={() => setShowCreateModal(true)}
-        className="bg-lime-500 text-black font-bold px-6 py-3 rounded-xl mb-6 hover:scale-105 transition"
-      >
-        Criar Sala
-      </button>
+      {currentUser ? (
+        <>
+          <div className="mb-6 text-center">
+            <p className="text-xl mb-1">
+              Bem-vindo, {currentUser.displayName || currentUser.email}!
+            </p>
+            <button
+              onClick={logout}
+              className="text-sm text-gray-400 hover:text-white underline"
+            >
+              Sair da conta
+            </button>
+          </div>
 
-      <button
-        onClick={() => setShowJoinModal(true)}
-        className="bg-yellow-400 text-black font-bold px-6 py-3 rounded-xl hover:scale-105 transition"
-      >
-        Entrar na Sala
-      </button>
+          <div className="flex flex-col gap-4 w-full max-w-xs">
+            <MainButton
+              onClick={() => setModals({ ...modals, create: true })}
+              theme="primary"
+            >
+              Criar Sala
+            </MainButton>
+
+            <MainButton
+              onClick={() => setModals({ ...modals, join: true })}
+              theme="secondary"
+            >
+              Entrar na Sala
+            </MainButton>
+          </div>
+        </>
+      ) : (
+        <div className="text-center p-6 bg-gray-800 rounded-lg">
+          <h2 className="text-2xl mb-4">Faça login para jogar</h2>
+          <p className="text-gray-400">
+            Você precisa estar logado para criar ou entrar em salas
+          </p>
+        </div>
+      )}
 
       <CreateRoomModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
+        isOpen={modals.create}
+        onClose={() => setModals({ ...modals, create: false })}
         onCreate={handleCreateRoom}
       />
 
-<JoinRoomModal
-  isOpen={showJoinModal}
-  onClose={() => setShowJoinModal(false)}
-  onJoin={handleJoinRoomModal}
-/>
+      <JoinRoomModal
+        isOpen={modals.join}
+        onClose={() => setModals({ ...modals, join: false })}
+        onJoin={handleJoinRoom}
+      />
+
+      <AgeVerificationModal
+        isOpen={modals.ageRestricted}
+        onClose={() => setModals({ ...modals, ageRestricted: false })}
+        message={ageError}
+      />
     </div>
   );
 }
