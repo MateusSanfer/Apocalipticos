@@ -16,6 +16,7 @@ import CardDisplay from "../components/game/CardDisplay";
 import PlayerActions from "../components/game/PlayerActions";
 import Timer from "../components/game/Timer";
 import RankingJogadores from "../components/ranking/RankingJogadores";
+import { atualizarPontuacao } from "../firebase/jogadores";
 
 export default function Jogo() {
   const { codigo } = useParams();
@@ -27,7 +28,9 @@ export default function Jogo() {
   const [actionTaken, setActionTaken] = useState(false);
   const [jogadores, setJogadores] = useState([]);
   const [meuUid, setMeuUid] = useState(null);
-
+  const somarPonto = () => {
+    atualizarPontuacao(codigo, meuUid, 10); // +10 pontos
+  };
   // Monitorar estado do jogo
   useEffect(() => {
     const salaRef = doc(db, "salas", codigo);
@@ -91,9 +94,6 @@ export default function Jogo() {
     return () => unsubscribe();
   }, [codigo]);
 
-  
-  
-
   const handleSortearCarta = async () => {
     if (!isCurrentPlayer || !sala) return;
 
@@ -139,7 +139,7 @@ export default function Jogo() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
+    <div className="min-h-screen bg-gray-900 text-white p-4 ">
       <div className="max-w-2xl mx-auto">
         <GameHeader
           codigo={codigo}
@@ -178,9 +178,17 @@ export default function Jogo() {
         )}
       </div>
       {/* DIREITA - RANKING FIXO NO TOPO */}
-    <div className="w-[300px] p-1 absolute top-4 right-4 bg-opacity-10 backdrop-blur-md rounded-2xl shadow-lg">
+    <div className="hidden md:block w-[300px] absolute top-4 p-1 right-4 bg-opacity-10 backdrop-blur-md rounded-2xl shadow-lg">
       <h1 className="titulo text-xl font-bold mb-2 text-center ">Ranking de Jogadores</h1>
       <RankingJogadores jogadores={jogadores} meuUid={meuUid} />
+      
+      {/* Botão de teste */}
+      <button
+        onClick={somarPonto}
+        className="mt-4 px-4 py-2 bg-green-600 rounded hover:bg-green-700"
+      >
+        +10 Pontos
+      </button>
     </div>
     </div>
   );

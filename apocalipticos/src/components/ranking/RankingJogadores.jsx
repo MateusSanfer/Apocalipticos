@@ -1,6 +1,7 @@
 import React from "react";
 
 export default function RankingJogadores({ jogadores, meuUid }) {
+  
   return (
     <div className="bg-white rounded-xl overflow-hidden shadow-lg w-full max-w-md mx-auto mb-8 text-black">
       <div className="bg-gray-100 px-4 py-2 font-bold flex justify-between text-gray-700 border-b">
@@ -23,7 +24,7 @@ export default function RankingJogadores({ jogadores, meuUid }) {
               className="w-10 h-10 rounded-full object-cover"
             />
           ) : (
-            <span className="text-3xl">{jogador.avatar}</span>
+            <span className="text-3xl leading-none">{jogador.avatar}</span>
           )}
           </div>
           <span>{jogador.uid === meuUid ? "VOCÊ" : jogador.nome}</span>

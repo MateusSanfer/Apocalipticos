@@ -1,26 +1,44 @@
-import React from 'react'; // <-- NECESSÁRIO para usar JSX
-import { Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import Lobby from './pages/Lobby';
-import { useEffect, useState } from 'react';
-import { auth, signInAnonymously } from './firebase/config';
+import React from 'react';
+import { useEffect } from 'react';
+import { Outlet, useNavigation } from 'react-router-dom';
+import { auth, signInAnonymously, onAuthStateChanged } from './firebase/config';
+import { useAuth } from "./context/AuthContext";
+import LoadingScreen from './components/LoadingScreen';
 
 function App() {
-  const [uid, setUid] = useState(null);
+  const { currentUser, setCurrentUser, loading } = useAuth(); // <- pegando loading do contexto
+  const navigation = useNavigation();
 
   useEffect(() => {
-    signInAnonymously(auth)
-      .then((userCredential) => {
-        setUid(userCredential.user.uid);
-      })
-      .catch(console.error);
-  }, []);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      try {
+        if (!firebaseUser) {
+          const userCredential = await signInAnonymously(auth);
+          firebaseUser = userCredential.user;
+        }
+
+        setCurrentUser({
+          uid: firebaseUser.uid,
+          isAnonymous: firebaseUser.isAnonymous
+        });
+
+      } catch (authError) {
+        console.error("Auth error:", authError);
+        setCurrentUser(null);
+      }
+    });
+
+    return unsubscribe;
+  }, [setCurrentUser]);
+
+  if (navigation.state === 'loading' || loading) {
+    return <LoadingScreen theme="apocalypse" />;
+  }
 
   return (
-    <Routes>
-      <Route path="/" element={<Home uid={uid} />} />
-      <Route path="/lobby/:codigo" element={<Lobby uid={uid} />} />
-    </Routes>
+    <div className="app-container min-h-screen">
+      <Outlet />
+    </div>
   );
 }
 

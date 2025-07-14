@@ -1,14 +1,37 @@
-// main.jsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import App from './App.jsx';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import RoomProvider from './context/RoomProvider';
+import App from './App';
+import Home from './pages/Home';
+import Lobby from './pages/Lobby';
+import Jogo from './pages/Jogo';
+import ErrorPage from './pages/ErrorPage';
 import './index.css';
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: (
+      <AuthProvider>
+        <RoomProvider>
+          <App />
+        </RoomProvider>
+      </AuthProvider>
+    ),
+    errorElement: <ErrorPage />, // Tratamento global de erros
+    children: [
+      { index: true, element: <Home /> },
+      { path: 'lobby/:codigo', element: <Lobby /> },
+      { path: 'jogo/:codigo', element: <Jogo /> }
+    ]
+  }
+]);
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <RouterProvider router={router} />
   </React.StrictMode>
 );

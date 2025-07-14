@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react'; // Adicione esta linha
 
 export const Header = () => {
   return (

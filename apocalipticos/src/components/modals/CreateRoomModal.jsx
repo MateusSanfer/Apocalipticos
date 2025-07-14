@@ -80,6 +80,7 @@ export default function CreateRoomModal({ isOpen, onClose, onCreate }) {
       modo,
       nomeAdmin: nome,
       dataNascimento,
+      estado: "esperando",
     };
 
     onCreate(roomData);

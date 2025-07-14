@@ -11,7 +11,7 @@ import CreateRoomModal from "../components/modals/CreateRoomModal";
 import JoinRoomModal from "../components/modals/JoinRoomModal";
 import AgeVerificationModal from "../components/modals/AgeVerificationModal";
 import { useAuth } from "../context/AuthContext";
-
+import { useSounds } from "../hooks/useSounds";
 
 export default function Home() {
   const { currentUser, logout, loading } = useAuth();
@@ -22,6 +22,7 @@ export default function Home() {
   });
   const [ageError, setAgeError] = useState(null);
   const navigate = useNavigate();
+  const {playComecar} = useSounds()
 
   const handleCreateRoom = async (roomData) => {
     try {
@@ -43,6 +44,7 @@ export default function Home() {
         categorias: roomData.categorias || [],
         criador: currentUser.displayName || currentUser.email,
       });
+      playComecar()
       navigate(`/lobby/${codigo}`);
     } catch (err) {
       console.error("Erro ao criar sala:", err);
@@ -75,6 +77,7 @@ const handleJoinRoom = async (joinData) => {
             return;
           }
         }
+        playComecar()
       } catch {
         alert("Data de nascimento inválida");
         return;
@@ -118,9 +121,9 @@ const handleJoinRoom = async (joinData) => {
     <div className="min-h-screen flex flex-col items-center justify-center text-white p-4">
       <header className="mb-8 text-center">
         <img
-          src="/logo_apocalipticos.png"
+          src="/logo-apocalipticos.svg"
           alt="Logo Apocalípticos"
-          className="mx-auto mb-4 max-w-[200px] w-full h-auto"
+          className="mx-auto mb-4 max-w-[300px] w-full h-auto"
         />
         <h1 className="text-4xl font-bold mb-2">Apocalípticos🥶</h1>
         <p className="text-lg">

@@ -72,7 +72,7 @@ useEffect(() => {
 
   // 🔁 Redirecionar quando o jogo começar
 useEffect(() => {
-  if (sala?.estado === GAME_STATES.EM_ANDAMENTO) {
+  if (sala?.estado === GAME_STATES.ONGOING) {
     console.log("Jogo começou, redirecionando...");
     navigate(`/jogo/${codigo}`);
   }
