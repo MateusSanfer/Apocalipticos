@@ -3,11 +3,11 @@ import {
   getAuth, 
   signInAnonymously, 
   onAuthStateChanged,
-  connectAuthEmulator 
+  //connectAuthEmulator 
 } from "firebase/auth";
 import { 
   getFirestore, 
-  connectFirestoreEmulator 
+  //connectFirestoreEmulator 
 } from "firebase/firestore";
 import { getAnalytics, isSupported } from "firebase/analytics";
 

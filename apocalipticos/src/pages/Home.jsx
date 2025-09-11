@@ -52,8 +52,6 @@ export default function Home() {
     }
   };
 
-  
-
 const handleJoinRoom = async (joinData) => {
   try {
     if (!currentUser) {
@@ -107,8 +105,6 @@ const handleJoinRoom = async (joinData) => {
   }
 };
 
-
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900">
@@ -135,14 +131,17 @@ const handleJoinRoom = async (joinData) => {
         <>
           <div className="mb-6 text-center">
             <p className="text-xl mb-1">
-              Bem-vindo, {currentUser.displayName || currentUser.email}!
+              {/* Decidir se vai mostrar ou não o nome da pessoa */}
+              {/* Bem-vindo, {currentUser.displayName || currentUser.email}! */}
+              Bem-vindo!
             </p>
-            <button
+            {/* Reativar depois de criar a função de saida! */}
+            {/* <button
               onClick={logout}
               className="text-sm text-gray-400 hover:text-white underline"
             >
               Sair da conta
-            </button>
+            </button> */}
           </div>
 
           <div className="flex flex-col gap-4 w-full max-w-xs">
