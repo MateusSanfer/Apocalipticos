@@ -152,8 +152,20 @@ const handleTogglePronto = async () => {
     jogadoresSemHost.every((j) => j.pronto === true);
 
   return (
-    <div className="min-h-screen  text-white p-4">
+<div className="min-h-screen text-white p-4">
       <div className="max-w-2xl mx-auto">
+      
+        <div className="mb-6 text-center">
+          <p className="text-lg font-semibold mb-2">Chat de Voz</p>
+          <a 
+            href={sala.discordLink} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors"
+          >
+            🎤 Abrir Discord
+          </a>
+        </div>
         <ImagemLogo className="rounded-lg shadow-lg" />
 
         <RoomHeader codigo={codigo} modo={sala.modo} isHost={isHost} />

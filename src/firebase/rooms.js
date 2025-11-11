@@ -59,6 +59,7 @@ export async function criarSala(uid, roomData) {
       idade: calcularIdade(roomData.dataNascimento),
     },
     estado: GAME_STATES.WAITING, // Usando constante
+    discordLink: roomData.discordLink,
     historico: [],
     criadoEm: serverTimestamp(),
     atualizadoEm: serverTimestamp(),
