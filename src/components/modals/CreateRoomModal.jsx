@@ -91,7 +91,7 @@ export default function CreateRoomModal({ isOpen, onClose, onCreate }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="bg-apocal-laranjaEscuro p-6 rounded-xl w-full max-w-md shadow-lg">
-        <h2 className=" col text-2xl font-bold mb-4 text-center">Criar Sala</h2>
+        <h2 className=" col text-2xl font-bold mb-4 text-center">Criar Nova Sala</h2>
 
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">Seu nome:</label>
