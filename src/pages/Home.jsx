@@ -29,7 +29,7 @@ export default function Home() {
   });
   const [ageError, setAgeError] = useState(null);
   const navigate = useNavigate();
-  const { playComecar, playHome, stopHome, isMusicPlaying, toggleHomeMusic } = useSounds();
+  const { playComecar, playHome, stopHome, toggleHomeMusic, isMusicPlaying } = useSounds();
 
   useEffect(() => {
     playHome(); // toca ao entrar na Home
@@ -133,15 +133,45 @@ export default function Home() {
         <div className="absolute inset-0 bg-white/2 backdrop-blur-[2px]" />{" "}
         {/* overlay escuro */}
         <main className="relative z-10 flex flex-col items-center justify-center w-full max-w-5xl mx-auto text-center">
-          {/* LOGO E TÍTULO */}
+          {/* LOGO E TÍTULO */ }
           <header className="text-center mb-6 sm:mb-8 flex flex-col items-center gap-2 px-4 max-w-3xl">
+            <style>{`
+              .heartbeat-img {
+                transform-origin: center;
+                will-change: transform, opacity;
+                animation: heartbeat 2.9s cubic-bezier(.215,.61,.355,1) infinite;
+              }
+
+              /* animação principal (batida) */
+              @keyframes heartbeat {
+                0%   { transform: scale(1) translateY(0); opacity: 1; }
+                14%  { transform: scale(1.12) translateY(-6px); opacity: 0.9; }
+                28%  { transform: scale(0.98) translateY(0); opacity: 1; }
+                42%  { transform: scale(1.06) translateY(-3px); opacity: 0.95; }
+                70%  { transform: scale(1) translateY(0); opacity: 1; }
+                100% { transform: scale(1) translateY(0); opacity: 1; }
+              }
+
+              /* efeito de "piscar" sutil sincronizado com a batida */
+              .heartbeat-img::after { content: ""; }
+              /* se quiser um piscar mais pronunciado, adicione uma segunda animação:
+                 animation: heartbeat 1.2s cubic-bezier(...) infinite, blink 1.2s linear infinite;
+              */
+              @keyframes blink {
+                0%   { opacity: 1; }
+                12%  { opacity: 0.6; }
+                24%  { opacity: 1; }
+                100% { opacity: 1; }
+              }
+            `}</style>
+
             <img
               src="/logo-apocalipticos.svg"
               alt="Logo Apocalípticos"
-              className="mx-auto mb-3 w-40 sm:w-56 md:w-64 max-w-[80%] object-contain"
+              className="heartbeat-img mx-auto mb-3 w-40 sm:w-56 md:w-64 max-w-[80%] object-contain"
             />
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-wide drop-shadow-lg">
-              Apocalípticos 🧟
+              Apocallípticos
             </h1>
             <p className="text-gray-300 mt-2 text-sm sm:text-base md:text-lg leading-relaxed">
               Sobreviva aos desafios mais absurdos com seus amigos
@@ -183,7 +213,7 @@ export default function Home() {
               <Zap className="mx-auto text-orange-400 w-8 h-8 mb-2" />
               <h3 className="font-semibold text-lg sm:text-xl">Multijogador</h3>
               <p className="text-gray-300 text-sm">
-                Jogue com amigos em tempo real
+                Jogue com amigos em tempo real, e faça aquela pergunta secreta!
               </p>
             </div>
 
@@ -199,7 +229,7 @@ export default function Home() {
                 Jogo de bebida
               </h3>
               <p className="text-gray-300 text-sm">
-                Desafios e punições épicas
+                Desafios e punições épicas, sua criativida é a nossa diversão.
               </p>
             </div>
           </div>
