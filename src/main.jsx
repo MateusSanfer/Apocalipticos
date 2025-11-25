@@ -9,6 +9,8 @@ import Lobby from './pages/Lobby';
 import Jogo from './pages/Jogo';
 import ErrorPage from './pages/ErrorPage';
 import './index.css';
+import VideoBackground from './assets/VideoBackground';
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -16,6 +18,7 @@ const router = createBrowserRouter([
       <AuthProvider>
         <RoomProvider>
           <App />
+          
         </RoomProvider>
       </AuthProvider>
     ),

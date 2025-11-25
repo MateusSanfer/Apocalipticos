@@ -110,7 +110,7 @@ Este jogo é para maiores de 18 anos. Beba com responsabilidade. Em breve um mod
 
 ---
 
-## 🧙‍♂️ Autor
+## 🧙‍♂️ Autores
 
 Feito com caos por
 

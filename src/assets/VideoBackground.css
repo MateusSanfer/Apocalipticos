@@ -1,0 +1,37 @@
+/* Container principal que envolve tudo */
+.video-background-container {
+  position: relative;
+  width: 100%;
+  height: 100vh; /* Ocupa a altura total da viewport */
+  overflow: hidden; /* Garante que o vídeo não ultrapasse as bordas */
+}
+
+/* Estilo do elemento de vídeo */
+.video-element {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  transform: translate(-50%, -50%); /* Centraliza o vídeo */
+  z-index: -1; /* Coloca o vídeo atrás de todo o conteúdo */
+  object-fit: cover; /* Faz o vídeo cobrir todo o container, cortando as bordas se necessário */
+}
+
+/* Estilo para o conteúdo que ficará sobre o vídeo */
+.content-overlay {
+  position: relative;
+  z-index: 1; /* Coloca o conteúdo na frente do vídeo */
+  color: white;
+  text-align: center;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.5); /* Adiciona um overlay escuro para melhorar a legibilidade */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

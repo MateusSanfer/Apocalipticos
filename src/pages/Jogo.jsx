@@ -29,6 +29,7 @@ export default function Jogo() {
   const [actionTaken, setActionTaken] = useState(false);
   const [jogadores, setJogadores] = useState([]);
   const [meuUid, setMeuUid] = useState(null);
+  const [showRanking, setShowRanking] = useState(false);
    const somarPonto = () => {
     if (!meuUid) {
       console.warn("UID do jogador não encontrado");
@@ -145,57 +146,93 @@ export default function Jogo() {
 
   return (
      <PageLayout>
-    <div className="min-h-screen bg-gray-900 text-white p-4 ">
-      <div className="max-w-2xl mx-auto">
-        <GameHeader
-          codigo={codigo}
-          modo={sala.modo}
-          currentPlayer={currentPlayer}
-          isCurrentPlayer={isCurrentPlayer}
-        />
+    <div className="min-h-screen text-white p-4 flex justify-center">
+      <div className="w-full max-w-2xl mx-auto relative">
+        
+        {/* ÁREA DO JOGO */}
+        <div className="w-full">
+          <GameHeader
+            codigo={codigo}
+            modo={sala.modo}
+            currentPlayer={currentPlayer}
+            isCurrentPlayer={isCurrentPlayer}
+          />
 
-        {sala.cartaAtual ? (
-          <>
-            <CardDisplay carta={sala.cartaAtual} timeLeft={timeLeft} />
+          {sala.cartaAtual ? (
+            <>
+              <CardDisplay carta={sala.cartaAtual} timeLeft={timeLeft} />
 
-            {showActions && (
-              <PlayerActions
-                onComplete={handleComplete}
-                onPenalidade={handlePenalidade}
-                cardType={sala.cartaAtual.tipo}
-              />
-            )}
+              {showActions && (
+                <PlayerActions
+                  onComplete={handleComplete}
+                  onPenalidade={handlePenalidade}
+                  cardType={sala.cartaAtual.tipo}
+                />
+              )}
 
-            <Timer timeLeft={timeLeft} totalTime={30} />
-          </>
-        ) : (
-          <div className="text-center py-12">
-            {isCurrentPlayer ? (
-              <button
-                onClick={handleSortearCarta}
-                className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg text-lg font-bold"
-              >
-                Sortear Carta
-              </button>
-            ) : (
-              <p>Aguardando carta...</p>
-            )}
+              <Timer timeLeft={timeLeft} totalTime={30} />
+            </>
+          ) : (
+            <div className="text-center py-12">
+              {isCurrentPlayer ? (
+                <button
+                  onClick={handleSortearCarta}
+                  className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg text-lg font-bold"
+                >
+                  Sortear Carta
+                </button>
+              ) : (
+                <p>Aguardando carta...</p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* RANKING DESKTOP (SIDEBAR FIXA) - VISÍVEL APENAS >= 1340px */}
+        <div className="hidden min-[1340px]:block fixed top-2 right-2 w-[250px] 2xl:w-[320px] transition-all duration-300">
+          <h1 className="text-xl font-bold mb-2 text-center text-purple-300 drop-shadow-md !p-[3%]">Ranking</h1>
+          <RankingJogadores jogadores={jogadores} meuUid={meuUid} />
+          
+          {/* Botão de teste */}
+          <div className="text-center mt-4">
+            <button
+              onClick={somarPonto}
+              className="px-4 py-2 bg-green-600/80 hover:bg-green-600 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              +10 Pontos (Teste)
+            </button>
           </div>
-        )}
+        </div>
+
       </div>
-      {/* DIREITA - RANKING FIXO NO TOPO */}
-    <div className="hidden md:block w-[300px] absolute top-4 p-1 right-4 bg-opacity-10 backdrop-blur-md rounded-2xl shadow-lg">
-      <h1 className="titulo text-xl font-bold mb-2 text-center ">Ranking de Jogadores</h1>
-      <RankingJogadores jogadores={jogadores} meuUid={meuUid} />
-      
-      {/* Botão de teste */}
-      <button
-        onClick={somarPonto}
-        className="mt-4 px-4 py-2 bg-green-600 rounded hover:bg-green-700"
+
+      {/* BOTÃO FLUTUANTE RANKING MOBILE (VISÍVEL APENAS < 1340px) */}
+      <button 
+        onClick={() => setShowRanking(!showRanking)}
+        className="min-[1340px]:hidden fixed bottom-4 right-4 z-50 bg-purple-600 text-white p-3 rounded-full shadow-lg hover:bg-purple-700 transition-all"
       >
-        +10 Pontos
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
       </button>
-    </div>
+
+      {/* RANKING MOBILE MODAL */}
+      {showRanking && (
+        <div className="min-[1340px]:hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-sm relative">
+            <button 
+              onClick={() => setShowRanking(false)}
+              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 z-50 shadow-lg"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <h2 className="text-xl font-bold mb-4 text-center text-white">Ranking</h2>
+            <RankingJogadores jogadores={jogadores} meuUid={meuUid} />
+          </div>
+        </div>
+      )}
     </div>
     </PageLayout>
   );
