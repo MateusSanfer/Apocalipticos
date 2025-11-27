@@ -20,3 +20,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 - **React Warnings**:
     - Removido prop `timeLeft` inválida de elemento DOM.
     - Corrigido `ReferenceError: React is not defined` em alguns componentes.
+    - **Inicialização de Sala**: Corrigido bug onde novos jogos não sorteavam o primeiro jogador, travando o início.
+    - **Ranking**: Corrigido bug onde a pontuação aparecia como 0 (erro de nome de propriedade `pontuacao` vs `pontos`).
+    - **Contador de Bebidas**: Agora incrementa corretamente quando o jogador recusa ou recebe penalidade.
+    - **Fluxo de Recusa**: Adicionada etapa de confirmação do Admin quando um jogador decide "Recusar" (beber).
