@@ -2,7 +2,7 @@
 import React from "react"; // Adicione esta linha
 import { GAME_MODES } from "../../constants/constants";
 
-export const GameHeader = ({ codigo, modo, currentPlayer, isCurrentPlayer }) => {
+export const GameHeader = ({ codigo, modo, currentPlayer, isCurrentPlayer, jogadores }) => {
   const getModeLabel = (m) => {
     switch(m) {
       case GAME_MODES.NORMAL: return "Normal";
@@ -21,6 +21,8 @@ export const GameHeader = ({ codigo, modo, currentPlayer, isCurrentPlayer }) => 
     }
   };
 
+  const nomeJogadorAtual = jogadores?.find(j => j.uid === currentPlayer)?.nome || "Desconhecido";
+
   return (
     <div className="bg-gray-800 p-4 rounded-lg mb-4 shadow-md">
       <header className="flex justify-between items-center">
@@ -33,7 +35,7 @@ export const GameHeader = ({ codigo, modo, currentPlayer, isCurrentPlayer }) => 
         <div className="text-right">
           <p className="text-gray-400 text-sm">Vez de:</p>
           <p className={`font-bold ${isCurrentPlayer ? "text-green-400" : "text-white"}`}>
-            {isCurrentPlayer ? "VOCÊ" : currentPlayer}
+            {isCurrentPlayer ? "VOCÊ" : nomeJogadorAtual}
           </p>
         </div>
       </header>

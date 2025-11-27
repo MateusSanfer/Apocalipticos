@@ -1,3 +1,4 @@
+import React from "react";
 import { CARD_TYPES } from "../../constants/constants";
 
 export default function PlayerActions({ onComplete, onPenalidade, cardType }) {

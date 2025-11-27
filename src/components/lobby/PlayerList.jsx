@@ -51,12 +51,11 @@ const removerJogador = () => {
               <span>
                 {jogador.nome}
                 {jogador.uid === currentUser?.uid && " (Você)"}
-                {jogador.uid === currentUser?.uid &&
-                  jogador.isHost &&
-                  " (Host)"}
-                {jogador.uid !== currentUser?.uid &&
-                  jogador.isHost &&
-                  " (Host)"}
+                {jogador.isHost && (
+                  <span className="ml-2 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 text-xs px-1.5 py-0.5 rounded">
+                    Admin
+                  </span>
+                )}
               </span>
             </div>
             <div className="flex items-center gap-2">
