@@ -36,9 +36,7 @@ src/
     - Votos são salvos na subcoleção `salas/{codigo}/votos`.
     - O cliente monitora essa coleção e calcula o resultado quando todos votam.
 
-
-
-6.  - Botão Sair: No canto superior direito da tela do jogo, tem um ícone de "Sair".
+6. **Botão Sair: No canto superior direito da tela do jogo, tem um ícone de "Sair".**
     - Confirmação: Ao clicar, o jogo pergunta "Tem certeza?".
     - Sucessão de Poder:
     - Se um jogador comum sair, ele só é removido.
