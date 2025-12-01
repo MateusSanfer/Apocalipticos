@@ -29,19 +29,28 @@ src/
 2.  **Entrada**: Jogadores são adicionados à subcoleção `salas/{codigo}/jogadores`.
 3.  **Sincronização**: O componente `Jogo.jsx` usa `onSnapshot` para ouvir mudanças no documento da sala em tempo real.
 4.  **Ações**:
-    *   Quando um jogador clica em "Sortear Carta", uma função em `firebase/game.js` é chamada.
-    *   Essa função atualiza o campo `cartaAtual` no Firestore.
-    *   Todos os clientes recebem a atualização e renderizam a carta.
+    - Quando um jogador clica em "Sortear Carta", uma função em `firebase/game.js` é chamada.
+    - Essa função atualiza o campo `cartaAtual` no Firestore.
+    - Todos os clientes recebem a atualização e renderizam a carta.
 5.  **Votação (Amigos de Merda)**:
-    *   Votos são salvos na subcoleção `salas/{codigo}/votos`.
-    *   O cliente monitora essa coleção e calcula o resultado quando todos votam.
+    - Votos são salvos na subcoleção `salas/{codigo}/votos`.
+    - O cliente monitora essa coleção e calcula o resultado quando todos votam.
 
+
+
+6.  - Botão Sair: No canto superior direito da tela do jogo, tem um ícone de "Sair".
+    - Confirmação: Ao clicar, o jogo pergunta "Tem certeza?".
+    - Sucessão de Poder:
+    - Se um jogador comum sair, ele só é removido.
+    - Se o Admin (Host) sair, o sistema automaticamente promove o jogador mais antigo da sala para ser o novo Admin.
+    - Se for o último jogador a sair, a sala é marcada como abandonada.
+    
 ## 🔐 Segurança e Regras
 
-*   **Autenticação**: Anônima via Firebase Auth. Cada sessão gera um UID único.
-*   **Persistência**: O estado do usuário é persistido no LocalStorage para permitir reconexão (refresh da página).
+- **Autenticação**: Anônima via Firebase Auth. Cada sessão gera um UID único.
+- **Persistência**: O estado do usuário é persistido no LocalStorage para permitir reconexão (refresh da página).
 
 ## 🎨 Design System
 
-*   Utilizamos **TailwindCSS** para estilização.
-*   Animações são feitas com **Framer Motion**.
+- Utilizamos **TailwindCSS** para estilização.
+- Animações são feitas com **Framer Motion**.

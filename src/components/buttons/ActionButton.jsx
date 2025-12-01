@@ -9,7 +9,7 @@ import React from "react"; // Adicione esta linha
  * @param {React.ReactNode} props.children - O conteúdo do botão (texto, ícone, etc.).
  * @param {function} props.onClick - A função a ser chamada no clique do botão.
  * @param {boolean} [props.disabled=false] - Controla se o botão está desabilitado. É opcional.
- * @param {'primary' | 'ready' | 'not-ready' | 'danger'} props.theme - Define o estilo visual do botão.
+ * @param {'primary' | 'ready' | 'not-ready' | 'danger' | 'secondary'} props.theme - Define o estilo visual do botão.
  * @returns {JSX.Element} O componente do botão renderizado.
  */
 
@@ -23,6 +23,7 @@ export default function ActionButton({ children, onClick, disabled, theme }) {
     ready: "bg-green-600 hover:bg-green-700 text-white",
     "not-ready": "bg-yellow-600 hover:bg-yellow-700 text-white",
     danger: "bg-red-500 hover:bg-red-700 text-white",
+    secondary: "bg-gray-600 hover:bg-gray-700 text-white",
   };
 
   return (

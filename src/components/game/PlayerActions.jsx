@@ -11,7 +11,7 @@ export default function PlayerActions({ onComplete, onPenalidade, cardType }) {
               onClick={onComplete}
               className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold"
             >
-              Respondi
+              Responder
             </button>
             <button
               onClick={onPenalidade}

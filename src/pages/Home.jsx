@@ -243,7 +243,7 @@ export default function Home() {
                 Jogo de bebida
               </h3>
               <p className="text-gray-300 text-sm">
-                Desafios e punições épicas, sua criativida é a nossa diversão.
+                Desafios e punições épicas, sua criatividade é a nossa diversão.
               </p>
             </div>
           </div>
