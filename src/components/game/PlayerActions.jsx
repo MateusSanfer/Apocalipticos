@@ -1,7 +1,7 @@
 import React from "react";
 import { CARD_TYPES } from "../../constants/constants";
 
-export default function PlayerActions({ onComplete, onPenalidade, cardType }) {
+export default function PlayerActions({ onComplete, onPenalidade, onEuJa, onEuNunca, cardType }) {
   const renderButtons = () => {
     switch (cardType) {
       case CARD_TYPES.TRUTH:
@@ -42,13 +42,13 @@ export default function PlayerActions({ onComplete, onPenalidade, cardType }) {
         return (
           <>
             <button
-              onClick={onComplete}
+              onClick={onEuJa}
               className="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 rounded-lg font-bold"
             >
               Eu Já! (Beber)
             </button>
             <button
-              onClick={onPenalidade}
+              onClick={onEuNunca}
               className="px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-bold"
             >
               Eu Nunca

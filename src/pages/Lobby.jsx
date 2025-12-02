@@ -29,7 +29,7 @@ export default function Lobby() {
   const [jogadores, setJogadores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mostrarConfirmacaoSaida, setMostrarConfirmacaoSaida] = useState(false);
-  const { playMarcarPronto, playDesmarcarPronto, playRemover } = useSounds();
+  const { playMarcarPronto, playDesmarcarPronto, playRemover, stopMarcarPronto, stopDesmarcarPronto } = useSounds();
 
   // Monitorar estado da sala
   useEffect(() => {
@@ -110,8 +110,10 @@ export default function Lobby() {
 
       if (novoStatus) {
         playMarcarPronto();
+        stopDesmarcarPronto();
       } else {
         playDesmarcarPronto();
+        stopMarcarPronto();
       }
     } catch (err) {
       console.error("Erro ao atualizar status de pronto:", err);

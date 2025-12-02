@@ -154,6 +154,10 @@ Botão “Voltar à Home”
 
 ### 📍 Previsão: Janeiro 2026
 
+Tratamento de erros e bugs. Implementação de feedback visual e sonoro. 
+
+Melhorias na interface e experiência do usuário.
+
 Testes em dispositivos mobile e desktop.
 
 Correções de bugs e travamentos.

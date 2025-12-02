@@ -54,7 +54,9 @@ export function useSounds() {
 
   return {
     playMarcarPronto: () => play("marcarPronto"),
+    stopMarcarPronto: () => stop("marcarPronto"),
     playDesmarcarPronto: () => play("desmarcarPronto"),
+    stopDesmarcarPronto: () => stop("desmarcarPronto"),
     playRemover: () => play("remover"),
     playComecar: () => play("comecar"),
     playErro: () => play("erro"),

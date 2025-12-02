@@ -206,3 +206,28 @@ export async function sairDaSala(roomCode, uid) {
     throw error;
   }
 }
+
+/**
+ * Registra uma ação de um jogador na rodada atual (ex: Eu Nunca).
+ */
+export async function registrarAcaoRodada(roomCode, uid, action, nome, avatar) {
+  const acaoRef = doc(db, "salas", roomCode, "acoes", uid);
+  await setDoc(acaoRef, {
+    uid,
+    action,
+    nome,
+    avatar,
+    timestamp: serverTimestamp()
+  });
+}
+
+/**
+ * Limpa as ações da rodada anterior.
+ */
+export async function limparAcoesRodada(roomCode) {
+  const acoesRef = collection(db, "salas", roomCode, "acoes");
+  const snapshot = await getDocs(acoesRef);
+  
+  const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
+  await Promise.all(deletePromises);
+}

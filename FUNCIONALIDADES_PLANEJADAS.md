@@ -64,7 +64,7 @@ Apocalípticos é um jogo de desafios e interações em grupo, onde os jogadores
 | **Verdade ou Desafio** | 1. ADM escolhe "Verdade" ou "Desafio". <br> 2. Sistema sorteia carta da categoria. | 🔄 Parcial (Botões prontos, lógica de escolha pendente) |
 | **Decisões de Merda**  | 1. Situação absurda + castigo. <br> 2. Apenas jogador da vez executa.              | ✅ Implementado (Cartas genéricas)                      |
 | **Amigos de Merda**    | 1. Pergunta exibida. <br> 2. Todos votam. <br> 3. Mais votado bebe.                | 🔄 Pendente (Sistema de votação)                        |
-| **Eu Nunca**           | 1. Afirmação exibida. <br> 2. Quem já fez, bebe.                                   | 🔄 Pendente (Melhorar a logica e analisar se é nescessario o admin confirmar se o participante bebeu. para que ele possa confirmar se o usuario da vez compriu o desafio ou não)                          |
+| **Eu Nunca**           | 1. Afirmação exibida. <br> 2. Todos votam (Eu Já/Eu Nunca). <br> 3. Feedback visual em tempo real. <br> 4. Admin avança rodada. | ✅ Implementado (Com feedback visual e animações)       |
 
 ## 🔜 Próximos Passos
 

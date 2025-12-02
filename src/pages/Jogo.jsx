@@ -16,11 +16,12 @@ import {
 } from "firebase/firestore";
 import { AuthContext } from "../context/AuthContext";
 import { sortearCarta, proximoJogador, submitVote } from "../firebase/game";
-import { sairDaSala } from "../firebase/rooms";
+import { sairDaSala, registrarAcaoRodada, limparAcoesRodada } from "../firebase/rooms";
 import PageLayout from "../components/PageLayout";
 import { GameHeader } from "../components/game/GameHeader";
 import CardDisplay from "../components/game/CardDisplay";
 import PlayerActions from "../components/game/PlayerActions";
+import PlayerStatusGrid from "../components/game/PlayerStatusGrid";
 import Timer from "../components/game/Timer";
 import RankingJogadores from "../components/ranking/RankingJogadores";
 import VotingArea from "../components/game/VotingArea";
@@ -42,15 +43,20 @@ export default function Jogo() {
   // Estados para Votação (Amigos de Merda)
   const [votos, setVotos] = useState({});
   const [resultadoVotacao, setResultadoVotacao] = useState(null);
+  const [acoesRodada, setAcoesRodada] = useState({});
 
   const meuUid = user?.uid;
   const currentPlayer = sala?.jogadorAtual;
   const isCurrentPlayer = currentPlayer === meuUid;
-  const showActions = isCurrentPlayer && !actionTaken && sala?.cartaAtual;
+
 
   // Se for votação, todos podem agir (votar), não só o jogador da vez
   const isVotingRound = sala?.cartaAtual?.tipo === CARD_TYPES.FRIENDS;
+  const isNeverRound = sala?.cartaAtual?.tipo === CARD_TYPES.NEVER;
   const showVotingArea = isVotingRound && !resultadoVotacao;
+  
+  // No Eu Nunca, todos veem as ações. Nos outros, só o jogador da vez.
+  const showActions = (isCurrentPlayer || isNeverRound) && !actionTaken && sala?.cartaAtual;
 
   // Listener da Sala
   useEffect(() => {
@@ -110,6 +116,22 @@ export default function Jogo() {
 
     return () => unsub();
   }, [codigo, isVotingRound, jogadores.length]);
+
+  // Listener de Ações da Rodada (Eu Nunca)
+  useEffect(() => {
+    if (!codigo || !isNeverRound) return;
+
+    const q = collection(db, "salas", codigo, "acoes");
+    const unsub = onSnapshot(q, (snapshot) => {
+      const novasAcoes = {};
+      snapshot.docs.forEach((doc) => {
+        novasAcoes[doc.id] = doc.data();
+      });
+      setAcoesRodada(novasAcoes);
+    });
+
+    return () => unsub();
+  }, [codigo, isNeverRound]);
 
   // Timer (apenas o ADM ou Jogador Atual decrementa no Firestore para evitar conflitos de escrita)
   // Simplificação: Cada um decrementa local, mas sync via firestore é melhor.
@@ -248,6 +270,36 @@ export default function Jogo() {
     await passarVez();
   };
 
+  const handleEuJa = async () => {
+    try {
+      // 1. Incrementa stats
+      const playerRef = doc(db, "salas", codigo, "jogadores", meuUid);
+      await updateDoc(playerRef, {
+        "stats.bebidas": increment(1),
+        "stats.euJa": increment(1),
+        ultimaAcao: serverTimestamp(),
+      });
+      
+      // 2. Registra ação visual para todos verem
+      const eu = jogadores.find(j => j.uid === meuUid);
+      await registrarAcaoRodada(codigo, meuUid, "EU_JA", eu?.nome, eu?.avatar);
+      
+      toast("🍺 Você bebeu!", { icon: "🍺" });
+    } catch (error) {
+      console.error("Erro ao registrar Eu Já:", error);
+    }
+  };
+
+  const handleEuNunca = async () => {
+    try {
+      const eu = jogadores.find(j => j.uid === meuUid);
+      await registrarAcaoRodada(codigo, meuUid, "EU_NUNCA", eu?.nome, eu?.avatar);
+      toast.success("😇 Salvo!");
+    } catch (error) {
+      console.error("Erro ao registrar Eu Nunca:", error);
+    }
+  };
+
   const handleVote = async (targetUid) => {
     await submitVote(codigo, user.uid, targetUid);
   };
@@ -281,6 +333,9 @@ export default function Jogo() {
           await deleteDoc(doc(db, "salas", codigo, "votos", docVote.id));
         });
       }
+
+      // Limpar ações da rodada (Eu Nunca)
+      await limparAcoesRodada(codigo);
 
       await updateDoc(doc(db, "salas", codigo), {
         jogadorAtual: proximoUid,
@@ -438,9 +493,29 @@ export default function Jogo() {
                         <PlayerActions
                           onComplete={handleComplete}
                           onPenalidade={handlePenalidade}
+                          onEuJa={handleEuJa}
+                          onEuNunca={handleEuNunca}
                           cardType={sala.cartaAtual.tipo}
                         />
                       )
+                    )}
+
+                    {/* Botão de Próxima Rodada para Eu Nunca (Apenas Jogador Atual ou Admin) */}
+                    {isNeverRound && (
+                      <>
+                        <PlayerStatusGrid jogadores={jogadores} acoes={acoesRodada} />
+                        
+                        {(isCurrentPlayer || jogadores.find(j => j.uid === meuUid)?.isHost) && (
+                          <div className="text-center mt-6">
+                            <button
+                              onClick={passarVez}
+                              className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-bold"
+                            >
+                              Próxima Rodada (Encerrar Eu Nunca)
+                            </button>
+                          </div>
+                        )}
+                      </>
                     )}
                   </>
                 )}
