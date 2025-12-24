@@ -99,6 +99,16 @@ const cards = [
   { texto: "Cante o refrão de uma música com a língua pra fora.", tipo: CARD_TYPES.DARE, modo: GAME_MODES.NORMAL, categoria: CATEGORIES.TRUTH_OR_DARE },
   { texto: "Beba água de um potinho, como um cachorro.", tipo: CARD_TYPES.DARE, modo: GAME_MODES.NORMAL, categoria: CATEGORIES.TRUTH_OR_DARE },
   { texto: "Escolha alguém do grupo para ficar de mãos dadas até o final do jogo.", tipo: CARD_TYPES.DARE, modo: GAME_MODES.NORMAL, categoria: CATEGORIES.TRUTH_OR_DARE },
+
+  // --- AMIGOS DE MERDA (Votação) ---
+  { texto: "Quem seria o primeiro a morrer em um apocalipse zumbi?", tipo: CARD_TYPES.FRIENDS, modo: GAME_MODES.NORMAL, categoria: CATEGORIES.SHITTY_FRIENDS },
+  { texto: "Quem tem mais chance de ser preso por engano?", tipo: CARD_TYPES.FRIENDS, modo: GAME_MODES.NORMAL, categoria: CATEGORIES.SHITTY_FRIENDS },
+  { texto: "Quem gasta todo o salário com coisas inúteis?", tipo: CARD_TYPES.FRIENDS, modo: GAME_MODES.NORMAL, categoria: CATEGORIES.SHITTY_FRIENDS },
+  { texto: "Quem fingiria a própria morte para fugir de dívidas?", tipo: CARD_TYPES.FRIENDS, modo: GAME_MODES.NORMAL, categoria: CATEGORIES.SHITTY_FRIENDS },
+  { texto: "Quem se tornaria um ditador se tivesse poder?", tipo: CARD_TYPES.FRIENDS, modo: GAME_MODES.NORMAL, categoria: CATEGORIES.SHITTY_FRIENDS },
+  { texto: "Quem tem o histórico de pesquisa mais vergonhoso?", tipo: CARD_TYPES.FRIENDS, modo: GAME_MODES.NORMAL, categoria: CATEGORIES.SHITTY_FRIENDS },
+  { texto: "Quem venderia um órgão para comprar o iPhone novo?", tipo: CARD_TYPES.FRIENDS, modo: GAME_MODES.NORMAL, categoria: CATEGORIES.SHITTY_FRIENDS },
+  { texto: "Quem provavelmente já foi banido de algum lugar?", tipo: CARD_TYPES.FRIENDS, modo: GAME_MODES.NORMAL, categoria: CATEGORIES.SHITTY_FRIENDS },
 ];
 
 async function seedDatabase() {

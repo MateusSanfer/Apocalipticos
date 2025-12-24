@@ -231,3 +231,26 @@ export async function limparAcoesRodada(roomCode) {
   const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
   await Promise.all(deletePromises);
 }
+
+/**
+ * Registra um voto de um jogador em outro.
+ */
+export async function registrarVoto(roomCode, eleitorUid, alvoUid) {
+  const votoRef = doc(db, "salas", roomCode, "votos", eleitorUid);
+  await setDoc(votoRef, {
+    uid: eleitorUid,
+    alvo: alvoUid,
+    timestamp: serverTimestamp()
+  });
+}
+
+/**
+ * Limpa os votos da rodada.
+ */
+export async function limparVotosRodada(roomCode) {
+  const votosRef = collection(db, "salas", roomCode, "votos");
+  const snapshot = await getDocs(votosRef);
+  
+  const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
+  await Promise.all(deletePromises);
+}

@@ -1,6 +1,22 @@
 # Changelog
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
+## [Não Lançado] - 2025-12-23
+
+### Adicionado
+
+- **Modo Amigos de Merda**:
+  - Implementado sistema de votação secreta ("Quem é mais provável de...").
+  - Tela de revelação do "vencedor" com destaque visual.
+  - Penalidade automática (+1 bebida) para o mais votado.
+  - Novas cartas adicionadas ao seed database.
+
+### Corrigido
+
+- **Lobby Responsivo**: Botões de "Sair" e "Expulsar" ajustados para telas pequenas (nomes longos são truncados).
+- **Migração de Host**: O Host agora pode sair da sala pelo Lobby, transferindo a liderança automaticamente.
+- **Renderização de Avatares**: Corrigido bug onde avatares apareciam como URLs de texto na votação.
+
 ## [Não Lançado] - 2025-12-16
 
 ### Corrigido

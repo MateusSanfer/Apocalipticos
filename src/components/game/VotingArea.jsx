@@ -24,7 +24,17 @@ export default function VotingArea({ jogadores, meuUid, onVote, votos, resultado
           O mais votado foi:
         </h2>
         <div className="flex flex-col items-center">
-          <div className="text-6xl mb-2">{maisVotado?.avatar || "🤡"}</div>
+          <div className="mb-4">
+            {maisVotado?.avatar && (maisVotado.avatar.startsWith("http") || maisVotado.avatar.includes("dicebear")) ? (
+              <img 
+                src={maisVotado.avatar} 
+                alt="Avatar" 
+                className="w-24 h-24 rounded-full bg-gray-700 object-cover border-4 border-red-500 mx-auto"
+              />
+            ) : (
+              <div className="text-6xl">{maisVotado?.avatar || "🤡"}</div>
+            )}
+          </div>
           <h3 className="text-xl font-bold">{maisVotado?.nome || "Desconhecido"}</h3>
           <p className="text-gray-400 mt-2">{resultado.totalVotos} votos</p>
         </div>
@@ -58,7 +68,17 @@ export default function VotingArea({ jogadores, meuUid, onVote, votos, resultado
                 ${!!votoSelecionado && !isSelected ? "opacity-50 grayscale" : ""}
               `}
             >
-              <div className="text-4xl mb-2">{jogador.avatar}</div>
+              <div className="flex justify-center mb-2">
+                {jogador.avatar && (jogador.avatar.startsWith("http") || jogador.avatar.includes("dicebear")) ? (
+                  <img 
+                    src={jogador.avatar} 
+                    alt="Avatar" 
+                    className="w-16 h-16 rounded-full bg-gray-700 object-cover border-2 border-gray-600"
+                  />
+                ) : (
+                  <span className="text-4xl">{jogador.avatar || "👤"}</span>
+                )}
+              </div>
               <div className="font-bold truncate">{isMe ? "Você" : jogador.nome}</div>
               
               {/* Indicador de voto (apenas visual para quem votou) */}

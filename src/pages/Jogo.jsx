@@ -16,7 +16,7 @@ import {
 } from "firebase/firestore";
 import { AuthContext } from "../context/AuthContext";
 import { sortearCarta, proximoJogador, submitVote } from "../firebase/game";
-import { sairDaSala, registrarAcaoRodada, limparAcoesRodada } from "../firebase/rooms";
+import { sairDaSala, registrarAcaoRodada, limparAcoesRodada, registrarVoto, limparVotosRodada } from "../firebase/rooms";
 import PageLayout from "../components/PageLayout";
 import { GameHeader } from "../components/game/GameHeader";
 import CardDisplay from "../components/game/CardDisplay";
@@ -109,7 +109,7 @@ useEffect(() => {
     const unsub = onSnapshot(q, (snapshot) => {
       const novosVotos = {};
       snapshot.docs.forEach((doc) => {
-        novosVotos[doc.id] = doc.data().target;
+        novosVotos[doc.id] = doc.data().alvo;
       });
       setVotos(novosVotos);
 
@@ -200,19 +200,14 @@ useEffect(() => {
     if (maisVotado) {
       setResultadoVotacao({ perdedor: maisVotado, totalVotos: maxVotos });
 
-      // Se eu sou o ADM (ou o jogador atual, para simplificar responsabilidade), aplico a penalidade
-      // Vamos deixar o jogador atual da rodada responsável por commitar o resultado no banco
-      if (isCurrentPlayer) {
+      // Apenas o Host ou Jogador Atual aplica a penalidade para evitar duplicidade
+      if (isCurrentPlayer || jogadores.find(j => j.uid === meuUid)?.isHost) {
         // Penalidade para o mais votado
         const playerRef = doc(db, "salas", codigo, "jogadores", maisVotado);
         await updateDoc(playerRef, {
           "stats.bebeu": increment(1), // Exemplo de penalidade
           ultimaAcao: serverTimestamp(),
         });
-
-        // Limpar votos do banco para a próxima
-        // (Isso seria ideal fazer numa cloud function, mas aqui fazemos no client)
-        // Deixar para limpar quando passar a vez
       }
     }
   };
@@ -309,7 +304,13 @@ useEffect(() => {
   };
 
   const handleVote = async (targetUid) => {
-    await submitVote(codigo, user.uid, targetUid);
+    try {
+      await registrarVoto(codigo, user.uid, targetUid);
+      toast.success("Voto registrado!");
+    } catch (error) {
+      console.error("Erro ao votar:", error);
+      toast.error("Erro ao registrar voto.");
+    }
   };
 
   const handleLeaveGame = () => {
@@ -335,11 +336,7 @@ useEffect(() => {
 
       // Limpar votos se houve votação
       if (isVotingRound) {
-        const votosRef = collection(db, "salas", codigo, "votos");
-        const snapshot = await getDocs(votosRef);
-        snapshot.forEach(async (docVote) => {
-          await deleteDoc(doc(db, "salas", codigo, "votos", docVote.id));
-        });
+        await limparVotosRodada(codigo);
       }
 
       // Limpar ações da rodada (Eu Nunca)

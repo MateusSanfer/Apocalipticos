@@ -12,7 +12,7 @@ dist
 dist-ssr
 *.local
 .env
-.FuncionalidadesPlanejadas.md
+.FUNCIONALIDADES_PLANEJADAS.md
 .CLONOGRAMA.md
 
 # Editor directories and files

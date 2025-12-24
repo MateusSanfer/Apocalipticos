@@ -82,7 +82,7 @@ salas/{codigo}/jogadores/{uid}
 
 ### 📍 Status: Em Andamento
 
-🔹 RankingJogadores.jsx exibe lista ordenada por pontuação.
+🔹 ✅ RankingJogadores.jsx exibe lista ordenada por pontuação.
 
 🔹 Framer Motion adicionado para animações suaves.
 

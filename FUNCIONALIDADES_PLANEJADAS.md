@@ -63,7 +63,7 @@ Apocalípticos é um jogo de desafios e interações em grupo, onde os jogadores
 | :--------------------- | :--------------------------------------------------------------------------------- | :------------------------------------------------------ |
 | **Verdade ou Desafio** | 1. ADM escolhe "Verdade" ou "Desafio". <br> 2. Sistema sorteia carta da categoria. | 🔄 Parcial (Botões prontos, lógica de escolha pendente) |
 | **Decisões de Merda**  | 1. Situação absurda + castigo. <br> 2. Apenas jogador da vez executa.              | ✅ Implementado (Cartas genéricas)                      |
-| **Amigos de Merda**    | 1. Pergunta exibida. <br> 2. Todos votam. <br> 3. Mais votado bebe.                | 🔄 Pendente (Sistema de votação)                        |
+| **Amigos de Merda**    | 1. Pergunta exibida. <br> 2. Votação secreta. <br> 3. Revelação do perdedor (bebe). | ✅ Implementado (Votação e Penalidade Automática)    |
 | **Eu Nunca**           | 1. Afirmação exibida. <br> 2. Todos votam (Eu Já/Eu Nunca). <br> 3. Feedback visual em tempo real. <br> 4. Admin avança rodada. | ✅ Implementado (Com feedback visual e animações)       |
 
 ## 🔜 Próximos Passos
@@ -76,7 +76,12 @@ Aqui estão algumas ideias para elevar o nível do nosso projeto, focando em eng
 
 - **Animações de Cartas**: Use `Framer Motion` para fazer a carta "virar" (flip effect) ao ser sorteada, ou deslizar da tela. Isso dá uma sensação tátil muito boa.
 - **Feedback Visual de Dano/Cura**: Quando alguém perde pontos, a tela poderia piscar levemente em vermelho (vignette). Quando ganha, em verde ou dourado.
+- **Feedback Visual de saida de jogador**: Quando alguém sai da sala, mostra uma animação de fade-out e remove da lista e uma mensagem de "jogador saiu da sala".
 - **Temas Dinâmicos**: O fundo da tela poderia mudar sutilmente dependendo do modo de jogo (ex: mais sombrio no modo "Difícil", mais neon no "+18").
+
+### Correções
+
+- **Botão de Sair da Sala e Expulsar Jogador**: O botão para sair do lobby ou expulsar um jogador não está aparecendo em telas pequenas.
 
 ## 2. Mecânicas de Jogo
 
@@ -101,5 +106,7 @@ Aqui estão algumas ideias para elevar o nível do nosso projeto, focando em eng
 
 - ⏳ Implementar lógica de votação para "Amigos de Merda".
 - ⏳ Refinar fluxo de "Verdade ou Desafio" (escolha prévia).
+- ⏳ Implementar poderes especiais (escudo, vingança, troca).
+- ⏳ Adicionar rodadas especiais (rodada do caos).
 - ⏳ Adicionar efeitos sonoros e animações avançadas.
 - ⏳ Tela de Fim de Jogo.
