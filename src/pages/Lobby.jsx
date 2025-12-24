@@ -12,7 +12,7 @@ import {
 } from "firebase/firestore";
 import { AuthContext } from "../context/AuthContext";
 import { GAME_MODES, GAME_STATES } from "../constants/constants";
-import { iniciarJogo } from "../firebase/rooms";
+import { iniciarJogo, sairDaSala } from "../firebase/rooms";
 import PlayerList from "../components/lobby/PlayerList";
 import RoomHeader from "../components/lobby/RoomHeader";
 import ActionButton from "../components/buttons/ActionButton";
@@ -124,7 +124,7 @@ export default function Lobby() {
     if (!user) return;
 
     try {
-      await deleteDoc(doc(db, "salas", codigo, "jogadores", user.uid));
+      await sairDaSala(codigo, user.uid);
       navigate("/"); // volta pra home
     } catch (error) {
       console.error("Erro ao sair da sala:", error);
@@ -157,7 +157,7 @@ export default function Lobby() {
 
   return (
     <PageLayout>
-      <div className="min-h-screen text-white p-4">
+      <div className="min-h-screen text-white p-4 pb-20">
         <div className="max-w-2xl mx-auto">
           <div className="mb-6 text-center">
             
@@ -200,14 +200,12 @@ export default function Lobby() {
                 {jogadorAtual?.pronto ? "Pronto!" : "Marcar como Pronto"}
               </ActionButton>
             )}
-            {!isHost && (
-              <ActionButton
-                onClick={() => setMostrarConfirmacaoSaida(true)}
-                theme="danger"
-              >
-                Sair da Sala
-              </ActionButton>
-            )}
+            <ActionButton
+              onClick={() => setMostrarConfirmacaoSaida(true)}
+              theme="danger"
+            >
+              Sair da Sala
+            </ActionButton>
           </div>
         </div>
         {mostrarConfirmacaoSaida && (

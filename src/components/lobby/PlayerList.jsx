@@ -46,17 +46,17 @@ const removerJogador = () => {
               jogador.id === currentUser?.uid ? "bg-gray-700" : "bg-gray-900"
             }`}
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
               {jogador.avatar && (jogador.avatar.startsWith("http") || jogador.avatar.includes("dicebear")) ? (
                 <img 
                   src={jogador.avatar} 
                   alt="Avatar" 
-                  className="w-10 h-10 rounded-full bg-gray-700 object-cover border border-gray-600"
+                  className="w-10 h-10 rounded-full bg-gray-400 object-cover border border-gray-600 flex-shrink-0"
                 />
               ) : (
-                <span className="text-xl">{jogador.avatar || "👤"}</span>
+                <span className="text-xl flex-shrink-0">{jogador.avatar || "👤"}</span>
               )}
-              <span>
+              <span className="truncate">
                 {jogador.nome}
                 {jogador.uid === currentUser?.uid && " (Você)"}
                 {jogador.isHost && (
