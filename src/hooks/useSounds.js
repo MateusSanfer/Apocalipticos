@@ -17,8 +17,8 @@ export function useSounds() {
       sair: new Audio("/sounds/vai-carnica.mp3"), // Substituindo sair.mp3
       
       // New Sounds
-      flip: new Audio("/sounds/huh-desmarcar.mp3"),
-      success: new Audio("/sounds/oh_my_god_vine.mp3"),
+      flip: new Audio("/sounds/genio-aparecendo.mp3"),
+      success: new Audio("/sounds/ding.mp3"),
       fail: new Audio("/sounds/spongebob-fail.mp3"),
       clown: new Audio("/sounds/pato-donald-6.mp3"),
 
