@@ -61,7 +61,7 @@ Apocalípticos é um jogo de desafios e interações em grupo, onde os jogadores
 
 | Tipo de Jogo           | Fluxo                                                                              | Status                                                  |
 | :--------------------- | :--------------------------------------------------------------------------------- | :------------------------------------------------------ |
-| **Verdade ou Desafio** | 1. ADM escolhe "Verdade" ou "Desafio". <br> 2. Sistema sorteia carta da categoria. | 🔄 Parcial (Botões prontos, lógica de escolha pendente) |
+| **Verdade ou Desafio** | 1. ADM escolhe "Verdade" ou "Desafio". <br> 2. Sistema sorteia carta da categoria. | ✅ Completo (Modal de Escolha condicional)      |
 | **Decisões de Merda**  | 1. Situação absurda + castigo. <br> 2. Apenas jogador da vez executa.              | ✅ Implementado (Cartas genéricas)                      |
 | **Amigos de Merda**    | 1. Pergunta exibida. <br> 2. Votação secreta. <br> 3. Revelação do perdedor (bebe). | ✅ Implementado (Votação e Penalidade Automática)    |
 | **Eu Nunca**           | 1. Afirmação exibida. <br> 2. Todos votam (Eu Já/Eu Nunca). <br> 3. Feedback visual em tempo real. <br> 4. Admin avança rodada. | ✅ Implementado (Com feedback visual e animações)       |
@@ -78,12 +78,11 @@ Aqui estão algumas ideias para elevar o nível do nosso projeto, focando em eng
   > Ainda não está muito bonito, mas é um começo. Vou pesquisar mais sobre isso. E colocamos um design de melhor qualidade.
   
 - **Feedback Visual de Dano/Cura**: Quando alguém perde pontos, a tela poderia piscar levemente em vermelho (vignette). Quando ganha, em verde ou dourado.
-- **Feedback Visual de saida de jogador**: Quando alguém sai da sala, mostra uma animação de fade-out e remove da lista e uma mensagem de "jogador saiu da sala".
+- ✅ **Feedback Visual de saida de jogador**: Quando alguém sai da sala, mostra uma animação de fade-out e remove da lista e uma mensagem de "jogador saiu da sala".
 - **Temas Dinâmicos**: O fundo da tela poderia mudar sutilmente dependendo do modo de jogo (ex: mais sombrio no modo "Difícil", mais neon no "+18").
 - **Fontes**: Se você encontrar fontes mais adequadas para isso pode usar a vontade, essa que tem lá é apenas para testes. 
-- **Efeitos Sonoros**: Adicionar efeitos sonoros e animações avançadas, para subistituir algumas que não estão muito adequadas..
-  1. `flip:/sounds/huh-desmarcar.mp3` (Curto, distinto) essa ficou meio estranha. Colocar um som mais caracteristico de cartas.
-  2. `success: /sounds/oh_my_god_vine.mp3` (Comemorativo/Engraçado) esse audio não é muito bom. Ficou bem estranho tocando toda hora.
+- ✅ Adicionar efeitos sonoros e animações avançadas.
+  - Substituídos sons de Flip (`genio-aparecendo.mp3`) e Sucesso (`ding.mp3`) para opções mais agradáveis.
 
 ### Correções
 
@@ -97,7 +96,17 @@ Aqui estão algumas ideias para elevar o nível do nosso projeto, focando em eng
   - _Troca_: Trocar de carta uma vez por jogo.
 - **Sair da Sala**: Adicionar um botão para sair do jogor e ir para a Home.
 - **Rodadas Especiais**: A cada 5 rodadas, uma "Rodada do Caos" onde todos jogam ou as regras mudam (ex: vale o dobro de pontos).
+- **Repetição de Cartas**: Varias vezes a mesma carta pode ser sorteada. Por exemplo no Eu Nunca estava recebendo a mesma carta varias vezes. Sei que tem poucas cartas salvas ainda, mas acho que a lógica de sorteio precisa ser melhorada.  
+- **Repetição de Cartas**: Implementar lógica para evitar que a mesma carta seja sorteada repetidamente na mesma sessão.
+  - [ ] Criar histórico de cartas usadas na sessão (Sala).
+  - [ ] Filtrar cartas já usadas no sorteio.
+  - [ ] Resetar histórico quando todas as cartas do deck forem usadas.
+
 - **Fim de Jogo Épico**: Uma tela de pódio mostrando não só o vencedor, mas estatísticas engraçadas como "O Maior Bêbado" (quem mais recusou), "O Covarde" (quem mais pulou), etc.
+
+### Correções
+
+- **Botão de Sair da Sala e Expulsar Jogador**: O botão para sair do lobby ou expulsar um jogador não está aparecendo em telas pequenas.
 
 ## 3. Engajamento Social
 
@@ -110,12 +119,14 @@ Aqui estão algumas ideias para elevar o nível do nosso projeto, focando em eng
 - **Presença Online**: Melhorar o sistema de "Online/Offline" para remover jogadores que fecharam a aba mais rapidamente.
 
 
-- ⏳ Implementar lógica de votação para "Amigos de Merda".
-- ⏳ Refinar fluxo de "Verdade ou Desafio" (escolha prévia).
+- Criar logica para caso um jogador não votar ainda o administrador não pode avançar a rodada. Ou dever confirmar se quer avançar a rodada mesmo sem todos os votos. (Modos Eu nunca e amigos de merda)
+
+## Status das Implementações Recentes
+
+- ✅ Implementar lógica de votação para "Amigos de Merda". (Travas de Segurança Adicionadas)
+- ✅ Refinar fluxo de "Verdade ou Desafio" (escolha prévia e modal).
+- ✅ Adicionar efeitos sonoros e animações avançadas.
+- ✅ Sair da Sala e Sucessão de Host.
 - ⏳ Implementar poderes especiais (escudo, vingança, troca).
 - ⏳ Adicionar rodadas especiais (rodada do caos).
-- ⏳ Adicionar efeitos sonoros e animações avançadas.
-  - Adicionar efeitos sonoros e animações avançadas, para subistituir algumas que não estão muito adequadas..
-  1. `flip:/sounds/huh-desmarcar.mp3` (Curto, distinto) essa ficou meio estranha. Colocar um som mais caracteristico de cartas.
-  2. `success: /sounds/oh_my_god_vine.mp3` (Comemorativo/Engraçado) esse audio não é muito bom. Ficou bem estranho tocando toda hora.
 - ⏳ Tela de Fim de Jogo.

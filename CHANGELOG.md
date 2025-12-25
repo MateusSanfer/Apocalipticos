@@ -10,7 +10,13 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
   - Toasts customizados com tema Dark/Neon.
   - Animação de entrada e "flip" 3D para as cartas.
 - **Efeitos Sonoros**: Integração inicial de sons para ações principais (Flip, Sucesso, Falha, Votação, Sair).
+  - *Update*: Substituídos sons de Flip e Sucesso por versões mais sutis (`ding.mp3`, `genio-aparecendo.mp3`).
 - **Tratamento de Empate**: No modo "Amigos de Merda", se houver empate, todos os mais votados recebem penalidade.
+- **Lógica Verdade ou Desafio**:
+  - Implementado `ChoiceModal` para forçar escolha entre "Verdade" 😇 e "Desafio" 😈 antes de revelar a carta.
+  - Estratégia "Draw-First" para suportar Modos Mistos (ex: "Eu Nunca" não abre modal).
+  - Corrigido bug onde seeds de "Verdade" faltavam no modo Normal.
+- **Ferramentas**: Atualizado `seedDatabase.js` para sincronização inteligente (evita duplicatas) e adicionado guia de contribuição.
 
 ## [Não Lançado] - 2025-12-23
 

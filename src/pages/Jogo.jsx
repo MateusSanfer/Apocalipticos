@@ -13,6 +13,7 @@ import {
   getDocs,
   getDoc,
   deleteDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import { AuthContext } from "../context/AuthContext";
 import { sortearCarta, proximoJogador, submitVote } from "../firebase/game";
@@ -25,6 +26,7 @@ import PlayerStatusGrid from "../components/game/PlayerStatusGrid";
 import Timer from "../components/game/Timer";
 import RankingJogadores from "../components/ranking/RankingJogadores";
 import VotingArea from "../components/game/VotingArea";
+import ChoiceModal from "../components/game/ChoiceModal";
 import ConfirmModal from "../components/modals/ConfirmModal";
 import { CARD_TYPES, CATEGORIES } from "../constants/constants";
 import { useSounds } from "../hooks/useSounds";
@@ -41,6 +43,9 @@ export default function Jogo() {
   const [showRanking, setShowRanking] = useState(false);
   const [actionTaken, setActionTaken] = useState(false);
   const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [showChoiceModal, setShowChoiceModal] = useState(false);
+  const [choiceTimeLeft, setChoiceTimeLeft] = useState(10);
+  const [showForceModal, setShowForceModal] = useState(null); // null, 'VOTE', 'NEVER'
 
   // Estados para Votação (Amigos de Merda)
   const [votos, setVotos] = useState({});
@@ -245,6 +250,18 @@ useEffect(() => {
     }
   };
 
+  // Timer da Escolha (Local)
+  useEffect(() => {
+    if (showChoiceModal && choiceTimeLeft > 0) {
+      const timer = setTimeout(() => setChoiceTimeLeft((prev) => prev - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (showChoiceModal && choiceTimeLeft === 0) {
+      // Tempo acabou: escolha aleatória
+      const randomType = Math.random() > 0.5 ? CARD_TYPES.TRUTH : CARD_TYPES.DARE;
+      handleChoice(randomType);
+    }
+  }, [showChoiceModal, choiceTimeLeft]);
+
   const handleSortearCarta = async () => {
     if (!isCurrentPlayer || !sala) return;
 
@@ -253,17 +270,89 @@ useEffect(() => {
         sala.categorias && sala.categorias.length > 0
           ? sala.categorias
           : Object.values(CATEGORIES);
-      const carta = await sortearCarta(sala.modo, categorias);
+
+      // 1. Sorteamos uma carta "provisória" para definir o TIPO da rodada
+      // Isso garante que em modos mistos (ex: Normal), a chance de cair Verdade/Desafio 
+      // ou "Eu Nunca" segue a proporção real do banco de dados.
+      const { carta: tempCarta, reset } = await sortearCarta(
+        sala.modo, 
+        categorias, 
+        null, 
+        sala.cartasUsadas || []
+      );
+      
+      // Se houve reset, notificamos e atualizamos o histórico
+      if (reset) {
+        toast("Baralho reembaralhado! 🔄", { icon: "🃏" });
+        await updateDoc(doc(db, "salas", codigo), { cartasUsadas: [] });
+      }
+
+      // 2. Se a carta sorteada for do tipo Verdade ou Desafio, abrimos o Modal de Escolha
+      // A carta provisória é descartada (mas teoricamente "gasta" do sorteio, porém como é provisória não salvaremos ainda no histórico se for descartada. Salvemos apenas a FINAL).
+      // OBS: Se a carta for descartada aqui, ela NÃO deve entrar no histórico.
+      
+      if (tempCarta.categoria === CATEGORIES.TRUTH_OR_DARE || 
+          tempCarta.tipo === CARD_TYPES.TRUTH || 
+          tempCarta.tipo === CARD_TYPES.DARE) {
+        
+        setShowChoiceModal(true);
+        setChoiceTimeLeft(10);
+        return;
+      }
+
+      // 3. Se for outro tipo (Eu Nunca, Amigos de Merda, etc), exibimos direto
       await updateDoc(doc(db, "salas", codigo), {
-        cartaAtual: carta,
+        cartaAtual: tempCarta,
         timeLeft: 30,
+        // Adiciona ao histórico
+         cartasUsadas: reset ? [tempCarta.id] : arrayUnion(tempCarta.id)
       });
       setTimeLeft(30);
       setActionTaken(false);
-      setResultadoVotacao(null); // Resetar resultado local
+      setResultadoVotacao(null);
+      playFlip();
+
+    } catch (error) {
+      console.error("Erro ao sortear carta preliminar:", error);
+      toast.error("Erro ao iniciar rodada.");
+    }
+  };
+
+  const handleChoice = async (tipoEscolhido = null) => {
+    setShowChoiceModal(false);
+    
+    try {
+      const categorias =
+        sala.categorias && sala.categorias.length > 0
+          ? sala.categorias
+          : Object.values(CATEGORIES);
+      
+      // Passamos o tipoEscolhido para sortearCarta
+      const { carta, reset } = await sortearCarta(
+        sala.modo, 
+        categorias, 
+        tipoEscolhido, 
+        sala.cartasUsadas || []
+      );
+      
+      const updates = {
+        cartaAtual: carta,
+        timeLeft: 30,
+        cartasUsadas: reset ? [carta.id] : arrayUnion(carta.id)
+      };
+
+      if (reset) {
+         toast("Baralho reembaralhado! 🔄", { icon: "🃏" });
+      }
+      
+      await updateDoc(doc(db, "salas", codigo), updates);
+      setTimeLeft(30);
+      setActionTaken(false);
+      setResultadoVotacao(null);
       playFlip();
     } catch (error) {
       console.error("Erro ao sortear carta:", error);
+      toast.error("Erro ao sortear carta. Tente novamente.");
     }
   };
 
@@ -471,6 +560,31 @@ useEffect(() => {
                       resultado={resultadoVotacao}
                     />
 
+                    {/* Feedback de Progresso da Votação */}
+                    {!resultadoVotacao && (
+                      <div className="flex flex-col items-center justify-center mt-6 gap-3">
+                        <div className="bg-purple-900/40 backdrop-blur-sm border border-purple-500/30 px-6 py-2 rounded-full shadow-[0_0_15px_rgba(168,85,247,0.2)] animate-pulse">
+                          <p className="text-purple-200 font-bold flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-purple-500 animate-ping"></span>
+                            Aguardando Votos: <span className="text-white text-lg">{Object.keys(votos).length}</span> / {jogadores.length}
+                          </p>
+                        </div>
+                        
+                        {/* Botão de Forçar Resultado (Apenas Host) */}
+                        {jogadores.find(j => j.uid === meuUid)?.isHost && Object.keys(votos).length > 0 && (
+                          <button 
+                            onClick={() => setShowForceModal({ type: 'VOTE' })}
+                            className="group flex items-center gap-2 text-xs font-medium text-red-400 hover:text-red-300 transition-colors bg-red-500/10 hover:bg-red-500/20 px-4 py-2 rounded-lg border border-red-500/20"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                            </svg>
+                            Forçar Encerramento
+                          </button>
+                        )}
+                      </div>
+                    )}
+
                     {/* Botão para avançar após resultado da votação (Apenas Jogador Atual ou ADM) */}
                     {resultadoVotacao && isCurrentPlayer && (
                       <div className="text-center mt-6">
@@ -552,12 +666,40 @@ useEffect(() => {
                         
                         {(isCurrentPlayer || jogadores.find(j => j.uid === meuUid)?.isHost) && (
                           <div className="text-center mt-6">
-                            <button
-                              onClick={passarVez}
-                              className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-bold"
-                            >
-                              Próxima Rodada (Encerrar Eu Nunca)
-                            </button>
+                            {Object.keys(acoesRodada).length === jogadores.length ? (
+                                <button
+                                  onClick={passarVez}
+                                  className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl font-bold text-white shadow-lg shadow-purple-900/30 transform transition-all hover:scale-105 active:scale-95 flex items-center gap-2 mx-auto"
+                                >
+                                  <span>Próxima Rodada</span>
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                </button>
+                            ) : (
+                                <div className="flex flex-col items-center gap-3">
+                                    <div className="px-6 py-3 bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl flex items-center gap-3 text-slate-400 cursor-wait">
+                                      <div className="flex space-x-1">
+                                         <div className="w-2 h-2 bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+                                         <div className="w-2 h-2 bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                                         <div className="w-2 h-2 bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                      </div>
+                                      <span className="font-medium text-sm">Aguardando ({Object.keys(acoesRodada).length}/{jogadores.length})</span>
+                                    </div>
+                                    
+                                    {jogadores.find(j => j.uid === meuUid)?.isHost && (
+                                        <button 
+                                            onClick={() => setShowForceModal({ type: 'NEVER' })}
+                                            className="group flex items-center gap-2 text-xs font-medium text-red-400 hover:text-red-300 transition-colors bg-red-500/5 hover:bg-red-500/10 px-3 py-1.5 rounded-lg border border-red-500/10 hover:border-red-500/30"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                            </svg>
+                                            Forçar Próxima Rodada
+                                        </button>
+                                    )}
+                                </div>
+                            )}
                           </div>
                         )}
                       </>
@@ -655,6 +797,32 @@ useEffect(() => {
             mensagem="Tem certeza que deseja sair da sala? Se você for o Host, a liderança será passada para outro jogador."
             onConfirm={confirmLeaveGame}
             onCancel={() => setShowLeaveModal(false)}
+          />
+        )}
+
+        {showForceModal && (
+            <ConfirmModal
+                mensagem={
+                    showForceModal.type === 'VOTE' 
+                    ? "Alguns jogadores não votaram. Deseja encerrar a votação e calcular o resultado com os votos atuais?" 
+                    : "Alguns jogadores não interagiram. Deseja forçar o fim do Eu Nunca?"
+                }
+                onConfirm={() => {
+                    if (showForceModal.type === 'VOTE') {
+                        calcularResultadoVotacao(votos);
+                    } else {
+                        passarVez();
+                    }
+                    setShowForceModal(null);
+                }}
+                onCancel={() => setShowForceModal(null)}
+            />
+        )}
+
+        {showChoiceModal && (
+          <ChoiceModal 
+            onChoice={handleChoice} 
+            timeLeft={choiceTimeLeft} 
           />
         )}
 

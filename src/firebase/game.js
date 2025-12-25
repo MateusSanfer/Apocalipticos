@@ -7,25 +7,49 @@ import { CARD_TYPES } from "../constants/constants";
  * Sorteia uma carta aleatória do banco de dados baseada no modo e categorias.
  * @param {string} modo - O modo de jogo (ex: 'normal', 'mais18').
  * @param {string[]} categorias - Lista de categorias ativas.
- * @returns {Promise<Object>} A carta sorteada com ID e dados.
+ * @param {string} [tipo] - (Opcional) Tipo específico de carta (ex: 'verdade', 'desafio').
+ * @param {string[]} [cartasUsadas] - (Opcional) Array de IDs de cartas já usadas.
+ * @returns {Promise<{carta: Object, reset: boolean}>} Objeto com a carta sorteada e flag de reset.
  * @throws {Error} Se nenhuma carta for encontrada.
  */
-export async function sortearCarta(modo, categorias) {
+export async function sortearCarta(modo, categorias, tipo = null, cartasUsadas = []) {
   const cartasRef = collection(db, "cartas");
-  const q = query(
-    cartasRef,
+  let constraints = [
     where("modo", "==", modo),
     where("categoria", "in", categorias)
-  );
+  ];
+
+  if (tipo) {
+    constraints.push(where("tipo", "==", tipo));
+  }
+
+  const q = query(cartasRef, ...constraints);
 
   const snapshot = await getDocs(q);
   const cartas = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   
   if (cartas.length === 0) {
+    // Fallback: se não achar do tipo específico, tenta achar qualquer uma (e ignora filtro, pois vai falhar)
+    if (tipo) {
+       console.warn(`Nenhuma carta do tipo ${tipo} encontrada. Tentando fallback...`);
+       return sortearCarta(modo, categorias, null, cartasUsadas);
+    }
     throw new Error("Nenhuma carta encontrada para os critérios");
   }
 
-  return cartas[Math.floor(Math.random() * cartas.length)];
+  // Filtrar cartas já usadas
+  let cartasDisponiveis = cartas.filter(cart => !cartasUsadas.includes(cart.id));
+  let reset = false;
+
+  // Se todas as cartas já foram usadas, reseta o histórico e usa todas novamente
+  if (cartasDisponiveis.length === 0) {
+    console.log("Deck finalizado! Reembaralhando...");
+    cartasDisponiveis = cartas;
+    reset = true;
+  }
+
+  const cartaSorteada = cartasDisponiveis[Math.floor(Math.random() * cartasDisponiveis.length)];
+  return { carta: cartaSorteada, reset };
 }
 
 /**
