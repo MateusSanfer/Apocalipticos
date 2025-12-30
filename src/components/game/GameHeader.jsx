@@ -1,9 +1,9 @@
 // GameHeader.jsx
 import React from "react";
-import { LogOut } from "lucide-react";
+import { LogOut, Trophy } from "lucide-react";
 import { GAME_MODES } from "../../constants/constants";
 
-export const GameHeader = ({ codigo, modo, currentPlayer, isCurrentPlayer, jogadores, onLeave }) => {
+export const GameHeader = ({ codigo, modo, currentPlayer, isCurrentPlayer, jogadores, onLeave, isHost, onFinishGame }) => {
   const getModeLabel = (m) => {
     switch(m) {
       case GAME_MODES.NORMAL: return "Normal";
@@ -40,6 +40,17 @@ export const GameHeader = ({ codigo, modo, currentPlayer, isCurrentPlayer, jogad
               {isCurrentPlayer ? "VOCÊ" : nomeJogadorAtual}
             </p>
           </div>
+          
+          {isHost && (
+            <button
+              onClick={onFinishGame}
+              className="p-2 bg-yellow-600/20 hover:bg-yellow-600/40 text-yellow-400 rounded-lg transition-colors border border-yellow-500/30"
+              title="Encerrar Jogo (Pódio)"
+            >
+              <Trophy size={20} />
+            </button>
+          )}
+
           <button
             onClick={onLeave}
             className="p-2 bg-red-600/20 hover:bg-red-600/40 text-red-400 rounded-lg transition-colors"

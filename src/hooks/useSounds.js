@@ -21,6 +21,7 @@ export function useSounds() {
       success: new Audio("/sounds/ding.mp3"),
       fail: new Audio("/sounds/spongebob-fail.mp3"),
       clown: new Audio("/sounds/pato-donald-6.mp3"),
+      podium: new Audio("/sounds/vitoria.mp3"),
 
       musicaTema: Object.assign(new Audio("/sounds/bar-dos-doidos-blues2.mp3"), {
         loop: true,
@@ -112,6 +113,7 @@ export function useSounds() {
     // New Actions
     playFlip: () => play("flip"),
     playSuccess: () => play("success"),
+    playPodium: () => play("podium"),
     playFail: () => play("fail"),
     playClown: () => play("clown"),
     

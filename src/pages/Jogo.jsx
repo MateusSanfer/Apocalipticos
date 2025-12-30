@@ -26,6 +26,7 @@ import PlayerStatusGrid from "../components/game/PlayerStatusGrid";
 import Timer from "../components/game/Timer";
 import RankingJogadores from "../components/ranking/RankingJogadores";
 import VotingArea from "../components/game/VotingArea";
+import Podium from "../components/game/Podium";
 import ChoiceModal from "../components/game/ChoiceModal";
 import ConfirmModal from "../components/modals/ConfirmModal";
 import { CARD_TYPES, CATEGORIES } from "../constants/constants";
@@ -46,6 +47,7 @@ export default function Jogo() {
   const [showChoiceModal, setShowChoiceModal] = useState(false);
   const [choiceTimeLeft, setChoiceTimeLeft] = useState(10);
   const [showForceModal, setShowForceModal] = useState(null); // null, 'VOTE', 'NEVER'
+  const [showFinishConfirmModal, setShowFinishConfirmModal] = useState(false);
 
   // Estados para Votação (Amigos de Merda)
   const [votos, setVotos] = useState({});
@@ -71,6 +73,7 @@ export default function Jogo() {
     playingBgMusic,
     playFlip,
     playSuccess,
+    playPodium,
     playFail,
     playClown,
     playSair
@@ -94,6 +97,11 @@ useEffect(() => {
         if (!data.cartaAtual) {
           setResultadoVotacao(null);
           setVotos({});
+        }
+
+        // Redirecionar para o Lobby se o estado for 'waiting'
+        if (data.status === "waiting" || data.estado === "waiting") {
+          navigate(`/lobby/${codigo}`);
         }
       } else {
         navigate("/");
@@ -459,6 +467,87 @@ useEffect(() => {
     }
   };
 
+  const handleFinishGame = async () => {
+    try {
+      await updateDoc(doc(db, "salas", codigo), {
+        status: "completed",
+      });
+      playPodium(); // Musicão de vitória
+      setShowFinishConfirmModal(false);
+    } catch (error) {
+      console.error("Erro ao finalizar jogo:", error);
+      toast.error("Erro ao finalizar jogo.");
+    }
+  };
+
+  const resetGameData = async (newStatus) => {
+    try {
+      // 1. Resetar Sala
+      await updateDoc(doc(db, "salas", codigo), {
+        status: newStatus,
+        estado: newStatus === "waiting" ? "waiting" : "ongoing", // Mantendo consistência com Legacy (rooms.js)
+        cartaAtual: null,
+        cartasUsadas: [], // Reseta o histórico de cartas
+        // Opcional: manter categorias e config
+        "config.comecouEm": serverTimestamp(),
+      });
+
+      // 2. Resetar Stats de TODOS os jogadores
+      // Como não podemos fazer batch update em coleção inteira de uma vez sem ler,
+      // vamos ler e fazer um batch ou promise.all
+      const jogadoresRef = collection(db, "salas", codigo, "jogadores");
+      const snapshot = await getDocs(jogadoresRef);
+      
+      const resetPromises = snapshot.docs.map(playerDoc => {
+        return updateDoc(playerDoc.ref, {
+          pontos: 0,
+          "stats.bebeu": 0,
+          "stats.recusou": 0,
+          "stats.cumpriu": 0,
+          "stats.euJa": 0,
+          "stats.euNunca": 0, // Se tiver esse stat
+          ultimaAcao: serverTimestamp()
+        });
+      });
+
+      await Promise.all(resetPromises);
+      
+      // 3. Se for 'playing' (Novo Jogo), sortear novo jogador
+      if (newStatus === "playing") {
+        const uids = snapshot.docs.map(d => d.id);
+        const novoJogador = uids[Math.floor(Math.random() * uids.length)];
+        await updateDoc(doc(db, "salas", codigo), {
+          jogadorAtual: novoJogador,
+          estado: "playing" // Garantindo consistência se usar 'estado' ou 'status' (seu código usa 'status' em Jogo.jsx mas rooms.js usa 'estado'. Vamos manter 'status' por enquanto se é o que Jogo.jsx usa, ou corrigir. O código original de rooms.js usa 'estado'. Jogo.jsx usa 'sala.status'?)
+          // Verificando Jogo.jsx atual... ele usa 'sala.status' no handleFinishGame e Podium check.
+          // Mas rooms.js usa 'estado'. Isso é uma inconsistência latente.
+          // Vamos setar AMBOS para garantir.
+        });
+      }
+
+    } catch (error) {
+      console.error("Erro ao resetar dados do jogo:", error);
+      throw error;
+    }
+  };
+
+  const handleRestartGame = async () => {
+    try {
+        await resetGameData("playing"); // Ou 'ongoing' se for o enum
+        toast.success("Novo Jogo Iniciado!");
+    } catch(e) {
+        toast.error("Erro ao reiniciar jogo.");
+    }
+  };
+
+  const handleBackToLobby = async () => {
+    try {
+      await resetGameData("waiting");
+    } catch (error) {
+       toast.error("Erro ao voltar ao lobby.");
+    }
+  };
+
   const passarVez = async () => {
     try {
       const proximoUid = await proximoJogador(codigo, currentPlayer);
@@ -530,6 +619,17 @@ useEffect(() => {
     return <div className="text-white text-center p-8">Carregando jogo...</div>;
   }
 
+  // Se o jogo acabou, mostra o Pódio
+  if (sala.status === "completed") {
+    return (
+      <Podium 
+        jogadores={jogadores} 
+        onBackToLobby={handleBackToLobby} 
+        onRestart={handleRestartGame} 
+      />
+    );
+  }
+
   return (
     <PageLayout>
       <div className="min-h-screen text-white p-4 flex justify-center">
@@ -543,6 +643,8 @@ useEffect(() => {
               isCurrentPlayer={isCurrentPlayer}
               jogadores={jogadores}
               onLeave={handleLeaveGame}
+              isHost={jogadores.find(j => j.uid === meuUid)?.isHost}
+              onFinishGame={() => setShowFinishConfirmModal(true)}
             />
 
             {sala.cartaAtual ? (
@@ -819,6 +921,14 @@ useEffect(() => {
             />
         )}
 
+        {showFinishConfirmModal && (
+          <ConfirmModal
+            mensagem="Tem certeza que deseja encerrar o jogo agora? Todos serão levados para o Pódio."
+            onConfirm={handleFinishGame}
+            onCancel={() => setShowFinishConfirmModal(false)}
+          />
+        )}
+        
         {showChoiceModal && (
           <ChoiceModal 
             onChoice={handleChoice} 

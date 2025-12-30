@@ -46,7 +46,7 @@ Apocalípticos é um jogo de desafios e interações em grupo, onde os jogadores
   - ✅ Primeiro - O Usuario administrador deve confirmar se o usuario da vez compriu o desafio, isso vale para ele também caso seja sua vez.
   - ✅ Segundo - Deve ser contabilizado os pontos de ter comprido o desafio ou responder a pergunta. Caso contrario paga a penalidade e perde pontos.
   - ✅ Terceiro - Ao final do tempo, e o jogador da vez não tiver feito nenhuma ação, automaticamente sua vez é passada para outro e ele penalizado ou bebe.
-  - ✅ Oservação: caso a pontuação seja 0, e ele perder pontos, não deve ter um valor negativo, continua com a pontuação zerada.
+  - ✅ Observação: caso a pontuação seja 0, e ele perder pontos, não deve ter um valor negativo, continua com a pontuação zerada.
 - **Atualização do Placar**: Pontuação e estatísticas. (🔄 Em Desenvolvimento)
 - **Ranking em Tempo Real**: Lista ordenada. (🔄 Em Desenvolvimento)
 
@@ -86,7 +86,7 @@ Aqui estão algumas ideias para elevar o nível do nosso projeto, focando em eng
 
 ### Correções
 
-- **Botão de Sair da Sala e Expulsar Jogador**: O botão para sair do lobby ou expulsar um jogador não está aparecendo em telas pequenas.
+- **Interface do Lobby**: Melhorar a interface do lobby para que seja mais agradável e bonita. Principalmente o RoomHeader.jsx, está bem simples e feio.
 
 ## 2. Mecânicas de Jogo
 
@@ -102,16 +102,18 @@ Aqui estão algumas ideias para elevar o nível do nosso projeto, focando em eng
   - [ ] Filtrar cartas já usadas no sorteio.
   - [ ] Resetar histórico quando todas as cartas do deck forem usadas.
 
-- **Fim de Jogo Épico**: Uma tela de pódio mostrando não só o vencedor, mas estatísticas engraçadas como "O Maior Bêbado" (quem mais recusou), "O Covarde" (quem mais pulou), etc.
+- ✅ **Fim de Jogo Épico**: Uma tela de pódio mostrando não só o vencedor, mas estatísticas engraçadas como "O Maior Bêbado" e "O Arregão".
 
-### Correções
+## Correções
 
 - **Botão de Sair da Sala e Expulsar Jogador**: O botão para sair do lobby ou expulsar um jogador não está aparecendo em telas pequenas.
+
 
 ## 3. Engajamento Social
 
 - **Compartilhamento**: Botão para gerar uma imagem do resultado final para postar no Instagram/WhatsApp.
 - **Reações Rápidas**: Permitir que os outros jogadores mandem emojis (🔥, 🍻, 😱) que flutuam na tela durante a vez do outro.
+
 
 ## 4. Técnico
 
@@ -129,4 +131,4 @@ Aqui estão algumas ideias para elevar o nível do nosso projeto, focando em eng
 - ✅ Sair da Sala e Sucessão de Host.
 - ⏳ Implementar poderes especiais (escudo, vingança, troca).
 - ⏳ Adicionar rodadas especiais (rodada do caos).
-- ⏳ Tela de Fim de Jogo.
+- ✅ Tela de Fim de Jogo Épico (Pódio e Estatísticas).

@@ -121,7 +121,12 @@ const cards = [
   { texto: "Quem tem o histórico de pesquisa mais vergonhoso?", tipo: CARD_TYPES.FRIENDS, modo: GAME_MODES.NORMAL, categoria: CATEGORIES.SHITTY_FRIENDS },
   { texto: "Quem venderia um órgão para comprar o iPhone novo?", tipo: CARD_TYPES.FRIENDS, modo: GAME_MODES.NORMAL, categoria: CATEGORIES.SHITTY_FRIENDS },
   { texto: "Quem provavelmente já foi banido de algum lugar?", tipo: CARD_TYPES.FRIENDS, modo: GAME_MODES.NORMAL, categoria: CATEGORIES.SHITTY_FRIENDS },
+  
+  // --- DECISÕES DE MERDA (Votação - Adulto/Difícil) ---
+  {texto: "Ligue para seu Chefe e mande ele se fuder", tipo: CARD_TYPES.DECISIONS, modo: GAME_MODES.ADULTO, categoria: CATEGORIES.SHITTY_DECISIONS},
+  {texto: "Diga a sua mãe que você vai abrir um OlyFans e ela vai modelar.", tipo: CARD_TYPES.DECISIONS, modo: GAME_MODES.ADULTO, categoria: CATEGORIES.SHITTY_DECISIONS},
 ];
+
 
 async function seedDatabase() {
   try {

@@ -110,6 +110,7 @@ export async function iniciarJogo(roomCode) {
 
   await updateDoc(salaRef, {
     estado: GAME_STATES.ONGOING,
+    status: "playing", // Sync com Jogo.jsx para evitar loop de redirect
     jogadorAtual: primeiroJogador,
     atualizadoEm: serverTimestamp(),
     "config.comecouEm": serverTimestamp(),
