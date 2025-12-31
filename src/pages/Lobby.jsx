@@ -16,7 +16,7 @@ import { iniciarJogo, sairDaSala } from "../firebase/rooms";
 import PlayerList from "../components/lobby/PlayerList";
 import RoomHeader from "../components/lobby/RoomHeader";
 import ActionButton from "../components/buttons/ActionButton";
-import ImagemLogo from "../components/imagemLogo";
+import ImagemLogo from "../components/ImagemLogo";
 import ConfirmModal from "../components/modals/ConfirmModal";
 import { useSounds } from "../hooks/useSounds"; // ajuste o caminho conforme necessário
 import PageLayout from "../components/PageLayout";
