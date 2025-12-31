@@ -1,9 +1,9 @@
 // GameHeader.jsx
 import React from "react";
-import { LogOut, Trophy } from "lucide-react";
+import { LogOut, Trophy, Volume2, VolumeX } from "lucide-react";
 import { GAME_MODES } from "../../constants/constants";
 
-export const GameHeader = ({ codigo, modo, currentPlayer, isCurrentPlayer, jogadores, onLeave, isHost, onFinishGame }) => {
+export const GameHeader = ({ codigo, modo, currentPlayer, isCurrentPlayer, jogadores, onLeave, isHost, onFinishGame, onToggleMusic, isMuted }) => {
   const getModeLabel = (m) => {
     switch(m) {
       case GAME_MODES.NORMAL: return "Normal";
@@ -61,19 +61,7 @@ export const GameHeader = ({ codigo, modo, currentPlayer, isCurrentPlayer, jogad
         </div>
       </header>
       
-      {/* Barra de Ferramentas Extra (ex: Música) */}
-      <div className="flex justify-end mt-2">
-         {onToggleMusic && (
-            <button
-              onClick={() => onToggleMusic("musicaJogo")}
-              className="p-2 text-gray-400 hover:text-white transition-colors flex items-center gap-2 text-xs"
-              title={isMuted ? "Ativar Música" : "Silenciar Música"}
-            >
-              {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-              {isMuted ? "Música Off" : "Música On"}
-            </button>
-         )}
-      </div>
+ 
     </div>
   );
 };

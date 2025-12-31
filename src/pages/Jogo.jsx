@@ -88,6 +88,8 @@ export default function Jogo() {
     playSair
   } = useSounds();
 
+  const isMuted = playingBgMusic !== "musicaJogo";
+
   useEffect(() => {
     // Toca música se não estiver completado
     if (sala?.status === "completed") {
@@ -746,6 +748,8 @@ export default function Jogo() {
               onLeave={handleLeaveGame}
               isHost={jogadores.find(j => j.uid === meuUid)?.isHost}
               onFinishGame={() => setShowFinishConfirmModal(true)}
+              isMuted={isMuted}
+              onToggleMusic={toggleMusic}
             />
 
             {sala.cartaAtual ? (
