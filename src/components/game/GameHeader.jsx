@@ -60,8 +60,6 @@ export const GameHeader = ({ codigo, modo, currentPlayer, isCurrentPlayer, jogad
           </button>
         </div>
       </header>
-      
- 
     </div>
   );
 };
