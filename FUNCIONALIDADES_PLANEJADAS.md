@@ -13,13 +13,19 @@ Apocalípticos é um jogo de desafios e interações em grupo, onde os jogadores
 - **Login Persistente:** Funcionalidade para manter usuários logados (Google/Email) e evitar perda de sessão ao recarregar.
 - **Modo Anônimo:** Permitir jogar sem cadastro, mas com limitações de histórico.
 - **Perfil de usuário:** Salvar nome, avatar, etc.
+- **Funções iniciais:** Alterar senha, Alterar email, Alterar nome
+  1. Alterar senha
+  2. Alterar email
+  3. Alterar nome
 
 **Design e Funcionalidades**
 
 - ✅ Logotipo "Apocalípticos" (estilo neon/grunge).
 - ✅ Botões Principais: "Criar Sala", "Entrar na Sala".
-- **Footer:** Sobre nós, redes sociais, licença de uso.
-- Seria bom ter um tutorial de como jogar. 
+- ⏳ **Footer:** Sobre nós, redes sociais, licença de uso.
+- ⏳ Dar um foco maior na estilização da da carta na hora de escolher.
+- ⏳ Adicionar botão com "?" para explicar o que cada botão faz, ou no caso do mobile ao passar o mouse por cima do botão ele irá mostrar uma explicação.
+- ⏳ Criar uma interface que viage mais pela lory para não se tornar um jogo básico.
 
 **Criar Sala (Modal)**
 
@@ -47,6 +53,11 @@ Apocalípticos é um jogo de desafios e interações em grupo, onde os jogadores
 
 ### Correções
 
+- Alterar o avatar pela carta ou transforma a carta também em avatar.
+
+- Alterar o avatar pela carta ou transforma a carta também em avatar.
+  g
+
 ### 🎮 Tela de Jogo
 
 **Fluxo Principal**
@@ -59,13 +70,15 @@ Apocalípticos é um jogo de desafios e interações em grupo, onde os jogadores
   - Validação do Admin (confirma se cumpriu).
   - **Inatividade:** Se o tempo acabar e ninguém agir, passa e aplica penalidade automática.
 - ✅ **Placar e Ranking:** Atualização em tempo real de Vida (PV) e Estatísticas.
-
-**Funcionalidades de Sala**
+- ⏳ Dar um foco maior na estilização da da carta na hora de escolher.
+  **Funcionalidades de Sala**
 
 - **Sair da Sala:** Botão para sair e retornar à Home.
 - **Sucessão Automática:** Se o Admin sair, o próximo jogador mais antigo vira Admin.
 
 ### Correções
+
+- ⏳ **GameHeader**: Mudar o formato do jogadores da vez e adicionar o nome do jogador atual, o anterior e o próximo. E centralizar tudo.
 
 ---
 
@@ -89,6 +102,19 @@ Apocalípticos é um jogo de desafios e interações em grupo, onde os jogadores
 - [ ] Filtrar cartas já usadas no sorteio.
 
 - [ ] Resetar histórico quando todas as cartas do deck forem usadas.
+
+- **Decisoes de Merda:** O admin não está confirmando que o jogador cumpriu a tarefa.
+
+### ⏳ Pendências
+
+#### ⏳ Funções prevista
+
+- ⏳ Cartas com maior usabilidade
+- ⏳ Minhas cartas
+- ⏳ Histórico de partidas
+- ⏳ Amigos
+- ⏳ _Poder das cartas_
+  - ⏳ O poder das cartas ainda não foram aplicadas no jogo.
 
 ---
 
