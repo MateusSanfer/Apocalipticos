@@ -49,14 +49,13 @@ Apocalípticos é um jogo de desafios e interações em grupo, onde os jogadores
 - ✅ Contagem de Jogadores.
 - ✅ Botão "Iniciar Jogo" (apenas ADM).
 - ⏳ Chat Simples (opcional).
-- **Seleção de Personagem:** Jogadores escolhem sua Classe/Papel aqui (veja seção RPG).
+- ✅ **Seleção de Personagem:** Jogadores escolhem sua Classe/Papel aqui (veja seção RPG).
 
 ### Correções
 
-- Alterar o avatar pela carta ou transforma a carta também em avatar.
+- Alterar o avatar pela carta ou transforma a carta também em avatar. Eu particulamente prefiro como está, com aquelas figuras que tinhamos feito, deixa mais personalizado e caso repita o personagem teria uma perfil diferente do outro, mas parece que meu colega quer a foto do personagem que o usuário escolheu.
 
-- Alterar o avatar pela carta ou transforma a carta também em avatar.
-  g
+- ⏳ Adicionar uma Borda Colorida no avatar dependendo da classe (Ex: Vermelho pro Assassino, Branco pro Médico).
 
 ### 🎮 Tela de Jogo
 
@@ -78,7 +77,7 @@ Apocalípticos é um jogo de desafios e interações em grupo, onde os jogadores
 
 ### Correções
 
-- ⏳ **GameHeader**: Mudar o formato do jogadores da vez e adicionar o nome do jogador atual, o anterior e o próximo. E centralizar tudo.
+- ✅ **GameHeader**: Mudar o formato do jogadores da vez e adicionar o nome do jogador atual, o anterior e o próximo. E centralizar tudo.
 
 ---
 
@@ -105,7 +104,11 @@ Apocalípticos é um jogo de desafios e interações em grupo, onde os jogadores
 
 - **Decisoes de Merda:** O admin não está confirmando que o jogador cumpriu a tarefa.
 
+- **Ao selecionar novo jogo:** não está resetando os dados do jogo como a vida dos jogadores.
+
 ### ⏳ Pendências
+
+- Atualizar o useGameActions.js com os novos tipos de cartas.
 
 #### ⏳ Funções prevista
 
@@ -124,7 +127,10 @@ Apocalípticos é um jogo de desafios e interações em grupo, onde os jogadores
 
 > Ainda não está muito bonito, mas é um começo. Vou pesquisar mais sobre isso. E colocamos um design de melhor qualidade.
 
-⏳ **Feedback Visual de Dano/Cura**: Quando alguém perde pontos, a tela poderia piscar levemente em vermelho (vignette). Quando ganha, em verde ou dourado. (🔄 Em Desenvolvimento)
+⏳ **Feedback Visual de Dano/Cura:**
+
+- Quando alguém perde pontos, a tela poderia piscar levemente em vermelho (vignette). Quando ganha, em verde ou dourado. (🔄 Em Desenvolvimento)
+- Quando alguém usar uma habilidade seria bom que quem usou e em quem a habilidade foi aplicada fosse exibido em tela de todos os jogadores (🔄 Em Desenvolvimento)
 
 **Temas Dinâmicos**: O fundo da tela poderia mudar sutilmente dependendo do modo de jogo (ex: mais sombrio no modo "Difícil", mais neon no "+18").
 
@@ -139,18 +145,6 @@ Apocalípticos é um jogo de desafios e interações em grupo, onde os jogadores
 ## 4. Universo e Mecânicas RPG (Lore & Rules)
 
 > Uma **história narrativa coesa**, com **ambientação pós-apocalíptica**, e **5 personagens jogáveis**, cada um com **habilidades únicas** que **alteram o destino do jogo**, sempre mantendo o espírito de _drinking game_ (risco, sacrifício e escolhas difíceis).
-
-### 🌍 História: O Mundo de Apocalípticos
-
-O mundo acabou… mas a sede não.
-
-Após o **Colapso Rubro**, uma série de explosões nucleares e epidemias dissolveram governos, cidades e qualquer vestígio de ordem. Os poucos sobreviventes se espalharam em **zonas mortas**, vivendo entre ruínas, fumaça e silêncio.
-
-A humanidade não luta mais por dinheiro ou poder. Luta por **recursos**, **controle**… e **lucidez**.
-
-Em meio ao caos, surgiram os **Apocalípticos** — grupos de sobreviventes que se reúnem em antigos abrigos, bares abandonados e bunkers para enfrentar desafios brutais. Cada rodada não é apenas um jogo: é um **teste de sanidade, coragem e sobrevivência**.
-
-**Beber não é diversão. Beber é o preço para continuar vivo.**
 
 ---
 
@@ -167,7 +161,7 @@ O objetivo é terminar o jogo com **mais PV** que os oponentes.
 
 ---
 
-### 🧟 Personagens e Habilidades
+### 🧟 Personagens e Habilidades (✅ Implementado)
 
 Cada jogador assume um papel que pode **mudar o rumo da partida**. As habilidades possuem **Custo em Doses** para serem ativadas.
 
