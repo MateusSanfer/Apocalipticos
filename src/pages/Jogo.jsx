@@ -24,6 +24,7 @@ import ChoiceModal from "../components/game/ChoiceModal";
 import ConfirmModal from "../components/modals/ConfirmModal";
 import PowerUpBar from "../components/game/PowerUpBar";
 import ClassAbilityModal from "../components/game/ClassAbilityModal";
+import ChaosEventOverlay from "../components/game/chaos/ChaosEventOverlay";
 
 import { CARD_TYPES } from "../constants/constants";
 import { Volume2, VolumeX, Skull, Zap } from "lucide-react";
@@ -42,7 +43,7 @@ export default function Jogo() {
   // 1. Dados da Sala e Jogadores
   const { sala, jogadores, timeLeft, setTimeLeft, loading } = useGameRoom(
     codigo,
-    meuUid
+    meuUid,
   );
 
   // 2. Ações de Jogo (Cartas, Escolhas, Admin, Eu Nunca)
@@ -51,7 +52,7 @@ export default function Jogo() {
     sala,
     jogadores,
     meuUid,
-    setTimeLeft
+    setTimeLeft,
   );
 
   // 3. Votação (Amigos de Merda)
@@ -65,7 +66,7 @@ export default function Jogo() {
     meuUid,
     meuJogador,
     jogadores,
-    gameActions
+    gameActions,
   );
 
   // Estados locais UI
@@ -73,6 +74,7 @@ export default function Jogo() {
   const [showForceModal, setShowForceModal] = useState(null); // null, 'VOTE', 'NEVER'
   const [showRanking, setShowRanking] = useState(false);
   const [showAbilityModal, setShowAbilityModal] = useState(false);
+  const [customRole, setCustomRole] = useState(null); // Para eventos (Ex: Ditador)
 
   // Computed Values
   const currentPlayer = sala?.jogadorAtual;
@@ -116,7 +118,7 @@ export default function Jogo() {
     ) {
       if (isVotingRound) {
         voting.calcularResultadoVotacao(voting.votos);
-      } else if (isCurrentPlayer) {
+      } else if (isCurrentPlayer && sala?.cartaAtual?.tipo !== "CAOS") {
         gameActions.handlePenalidade();
       }
     }
@@ -135,7 +137,7 @@ export default function Jogo() {
     if (gameActions.showChoiceModal && gameActions.choiceTimeLeft > 0) {
       const timer = setTimeout(
         () => gameActions.setChoiceTimeLeft((prev) => prev - 1),
-        1000
+        1000,
       );
       return () => clearTimeout(timer);
     } else if (
@@ -164,7 +166,7 @@ export default function Jogo() {
     try {
       await sairDaSala(codigo, user.uid);
       toast.success("Você saiu da sala.");
-      navigate("/");
+      navigate("/app");
     } catch (error) {
       console.error("Erro ao sair da sala:", error);
       toast.error("Erro ao sair da sala.");
@@ -206,22 +208,28 @@ export default function Jogo() {
               modo={sala.modo}
               currentPlayer={currentPlayer}
               isCurrentPlayer={isCurrentPlayer}
-              jogadores={jogadores}
+              jogadores={jogadores} // Updated
               onLeave={handleLeaveGame}
               isHost={jogadores.find((j) => j.uid === meuUid)?.isHost}
               onFinishGame={() => gameActions.setShowFinishConfirmModal(true)}
+              sala={sala}
               // Removido props de musica redundantes
             />
 
             {sala.cartaAtual ? (
               <>
-                <CardDisplay carta={sala.cartaAtual} timeLeft={timeLeft} />
+                <CardDisplay
+                  carta={sala.cartaAtual}
+                  timeLeft={timeLeft}
+                  activeEvents={sala.activeEvents}
+                />
 
-                {/* Visualizar Power-ups */}
+                {/* Visualizar Power-ups (Não mostra em Eventos do Caos) */}
                 {isCurrentPlayer &&
                   !gameActions.actionTaken &&
                   !isVotingRound &&
-                  !isNeverRound && (
+                  !isNeverRound &&
+                  sala.cartaAtual.tipo !== "CAOS" && (
                     <PowerUpBar
                       powerups={meuJogador?.powerups}
                       onUse={(type) => {
@@ -288,7 +296,7 @@ export default function Jogo() {
                 {isVotingRound ? (
                   <div className="mt-6">
                     <VotingArea
-                      jogadores={jogadores}
+                      jogadores={jogadores} // Use Masked Only For Votes if Envy active? Or standard? Masked makes sense based on prompt.
                       meuUid={meuUid}
                       onVote={voting.handleVote}
                       votos={voting.votos}
@@ -324,7 +332,7 @@ export default function Jogo() {
                     {voting.resultadoVotacao && isCurrentPlayer && (
                       <div className="text-center mt-6">
                         <button
-                          onClick={gameActions.passarVez}
+                          onClick={() => gameActions.passarVez()}
                           className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-bold animate-bounce"
                         >
                           Próxima Rodada
@@ -338,8 +346,20 @@ export default function Jogo() {
                     <p className="text-lg font-bold text-yellow-400 mb-2">
                       {sala.statusAcao === "aguardando_penalidade"
                         ? "Jogador aceitou a penalidade (bebida)."
-                        : "Aguardando confirmação do Admin..."}
+                        : "Aguardando confirmação..."}
                     </p>
+
+                    {/* CHAOS EVENTS OVERLAY */}
+                    <ChaosEventOverlay
+                      sala={sala}
+                      jogadores={jogadores}
+                      meuUid={meuUid}
+                      gameActions={gameActions}
+                      setCustomRole={setCustomRole}
+                      setShowAbilityModal={setShowAbilityModal}
+                    />
+
+                    {/* STANDARD: Admin Confirmation (Allowed for Chaos too to unblock stuck state) */}
                     {jogadores.find((j) => j.uid === meuUid)?.isHost && (
                       <div className="flex justify-center gap-4 mt-4">
                         {sala.statusAcao === "aguardando_penalidade" ? (
@@ -355,13 +375,18 @@ export default function Jogo() {
                               onClick={gameActions.handleAdminConfirm}
                               className="px-6 py-2 bg-green-600 hover:bg-green-700 rounded font-bold"
                             >
-                              Confirmar (Cumpriu)
+                              Confirmar{" "}
+                              {sala.cartaAtual?.tipo === "CAOS"
+                                ? "(Ativar)"
+                                : "(Cumpriu)"}
                             </button>
                             <button
                               onClick={gameActions.handleAdminReject}
                               className="px-6 py-2 bg-red-600 hover:bg-red-700 rounded font-bold"
                             >
-                              Rejeitar (Não Cumpriu)
+                              {sala.cartaAtual?.tipo === "CAOS"
+                                ? "Cancelar"
+                                : "Rejeitar (Não Cumpriu)"}
                             </button>
                           </>
                         )}
@@ -369,23 +394,34 @@ export default function Jogo() {
                     )}
                   </div>
                 ) : (
-                  // Ações Normais (PlayerActions)
-                  showActions && (
-                    <PlayerActions
-                      onComplete={gameActions.handleComplete}
-                      onPenalidade={gameActions.handlePenalidade}
-                      onEuJa={gameActions.handleEuJa}
-                      onEuNunca={gameActions.handleEuNunca}
-                      cardType={sala.cartaAtual.tipo}
+                  // Ações Normais ou Chaos Actions
+                  <>
+                    <ChaosEventOverlay
+                      sala={sala}
+                      jogadores={jogadores}
+                      meuUid={meuUid}
+                      gameActions={gameActions}
+                      setCustomRole={setCustomRole}
+                      setShowAbilityModal={setShowAbilityModal}
                     />
-                  )
+
+                    {showActions && sala.cartaAtual.tipo !== "CAOS" && (
+                      <PlayerActions
+                        onComplete={gameActions.handleComplete}
+                        onPenalidade={gameActions.handlePenalidade}
+                        onEuJa={gameActions.handleEuJa}
+                        onEuNunca={gameActions.handleEuNunca}
+                        cardType={sala.cartaAtual.tipo}
+                      />
+                    )}
+                  </>
                 )}
 
                 {/* Botão de Próxima Rodada para Eu Nunca */}
                 {isNeverRound && (
                   <>
                     <PlayerStatusGrid
-                      jogadores={jogadores}
+                      jogadores={jogadores} // Updated
                       acoes={gameActions.acoesRodada}
                     />
                     {(isCurrentPlayer ||
@@ -394,7 +430,7 @@ export default function Jogo() {
                         {Object.keys(gameActions.acoesRodada).length ===
                         jogadores.length ? (
                           <button
-                            onClick={gameActions.passarVez}
+                            onClick={() => gameActions.passarVez()}
                             className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl font-bold text-white shadow-lg flex items-center gap-2 mx-auto"
                           >
                             Próxima Rodada
@@ -446,12 +482,33 @@ export default function Jogo() {
                         Usar Habilidade
                       </button>
                     )}
+
+                    {/* SLOTH SKIP BUTTON */}
+                    {sala?.activeEvents?.some((e) => e.id === "PREGUICA") && (
+                      <button
+                        onClick={async () => {
+                          toast("😴 Você escolheu dormir...", { icon: "💤" });
+                          await gameActions.handlePenalidade(); // Penalidade padrão (beber)
+                          // Se `handlePenalidade` apenas seta status, precisamos confirmar ou usar um metodo direto
+                          // handlePenalidade seta statusAcao="aguardando_penalidade".
+                          // Precisamos de algo direto: Tira HP e Passa.
+                          // Vamos usar takeDamage direto? Não temos acesso fácil aqui sem exportar takeDamage do hook actions.
+                          // Mas temos handlePenalidade. O fluxo normal é: Recusar -> Admin Confirma.
+                          // Para "Preguiça" ser fluido, deveria ser automático?
+                          // Vamos manter o fluxo: Clica em Dormir -> "Aceitou Penalidade" -> Admin Confirma.
+                        }}
+                        className="flex items-center gap-2 px-6 py-2 bg-blue-900/50 border border-blue-500/30 hover:bg-blue-800 rounded-lg text-blue-300 font-bold transition-all text-sm uppercase tracking-wider"
+                      >
+                        <span className="text-xl">💤</span>
+                        Pular (Beber)
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <p className="text-xl animate-pulse text-gray-300">
                     Aguardando{" "}
                     <span className="font-bold text-purple-400">
-                      {jogadores.find((j) => j.uid === currentPlayer)?.nome ||
+                      {jogadores.find((j) => j.uid === currentPlayer)?.nome || // Updated
                         "o jogador"}
                     </span>{" "}
                     sortear uma carta...
@@ -466,7 +523,8 @@ export default function Jogo() {
             <h1 className="text-xl font-bold mb-2 text-center text-purple-300 drop-shadow-md !p-[3%]">
               Ranking
             </h1>
-            <RankingJogadores jogadores={jogadores} meuUid={meuUid} />
+            <RankingJogadores jogadores={jogadores} meuUid={meuUid} />{" "}
+            {/* Updated */}
           </div>
         </div>
 
@@ -490,7 +548,8 @@ export default function Jogo() {
               <h2 className="text-xl font-bold mb-4 text-center text-white">
                 Ranking
               </h2>
-              <RankingJogadores jogadores={jogadores} meuUid={meuUid} />
+              <RankingJogadores jogadores={jogadores} meuUid={meuUid} />{" "}
+              {/* Updated */}
             </div>
           </div>
         )}
@@ -537,12 +596,57 @@ export default function Jogo() {
 
         <ClassAbilityModal
           isOpen={showAbilityModal}
-          onClose={() => setShowAbilityModal(false)}
+          onClose={() => {
+            setShowAbilityModal(false);
+            setCustomRole(null); // Limpa role customizada ao fechar
+          }}
           userRoleKey={meuJogador?.role}
+          customRole={customRole}
           jogadores={jogadores}
           meuUid={meuUid}
-          onUseAbility={gameActions.handleUseAbility}
+          onUseAbility={(uid, roleId, targetUid) => {
+            if (roleId === "ditador") {
+              gameActions.handleMultar(targetUid);
+            } else if (roleId === "cupido" || roleId === "parceiro_luxuria") {
+              gameActions.handleLinkSoul(targetUid);
+            } else if (roleId === "carrasco") {
+              gameActions.handleDuel(uid, targetUid);
+            } else {
+              gameActions.handleUseAbility(uid, roleId, targetUid);
+            }
+          }}
+          activeEvents={sala?.activeEvents} // PASSING EVENTS FOR FILTERING
         />
+
+        {/* BOTÃO DITADOR (ORGULHO) - Mantido aqui por ser role persistente */}
+        {sala?.activeEvents?.some(
+          (e) => e.id === "ORGULHO" && e.owner === meuUid,
+        ) && (
+          <button
+            onClick={() => {
+              setCustomRole({
+                id: "ditador",
+                name: "Ditador Supremo",
+                icon: "👑",
+                image:
+                  "https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=500&auto=format&fit=crop&q=60",
+                ability: {
+                  name: "Aplicar Multa",
+                  effect:
+                    "Puna quem desobeder suas regras! (Tira 5 Pontos de Vida)",
+                  cost: "Gratuito",
+                },
+                needsTarget: true,
+              });
+              setShowAbilityModal(true);
+            }}
+            className="fixed bottom-24 left-4 z-40 bg-yellow-600 hover:bg-yellow-500 text-white p-3 rounded-full shadow-lg border-2 border-yellow-300 animate-bounce flex items-center gap-2 font-bold uppercase tracking-wider"
+            title="APLICAR MULTA DO DITADOR"
+          >
+            <span className="text-xl">👑</span>
+            <span className="hidden md:inline">Multar</span>
+          </button>
+        )}
 
         {/* BOTÃO DE MÚSICA (Floating) */}
         <button

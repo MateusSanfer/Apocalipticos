@@ -2,6 +2,104 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
+## [Não Lançado] - 2026-02-04
+
+### Refinado (Responsividade & UX)
+
+- **Mobile First**:
+  - **Navbar**: Logo redimensionada e texto oculto em mobile para evitar poluição visual.
+  - **Hero Section**: Botões "Começar o Caos" e "Como Jogar" ajustados (`text-lg`) para caber em telas pequenas.
+  - **Story Cards**: Padding interno otimizado para leitura em dispositivos móveis.
+- **Navegação**:
+  - Botão **"Como Jogar"** agora realiza scroll suave (smooth scroll) para o rodapé da página.
+- **Correções Visuais**:
+  - Aumentado espaçamento superior (`pt-40`) da Hero Section para evitar que o título fique atrás da Navbar fixa.
+  - Corrigido typo "APOCALIÍPTICOS" -> "APOCALÍPTICOS".
+
+## [Não Lançado] - 2026-02-03
+
+### Adicionado (Landing Page)
+
+- **Seção de História Expandida**:
+  - Implementado layout de 5 cartões detalhando a Lore completa:
+    1. **A Grande Traição** (Projeto Aurora).
+    2. **Pós-Quarentena Rubra** (Isolamento em Bunkers).
+    3. **O Bar Apocalíptico** (Zona Neutra).
+    4. **Os Apocalípticos** (Resistência e Vício).
+    5. **Protocolo de Sanidade** (Mecânica de Jogo).
+  - Design responsivo com ícones e hover effects.
+- **Identidade Visual**:
+  - Atualizada a Navbar para usar a nova **Logo "Apocalípticos"** (Imagem) com efeitos de brilho e escala.
+  - Refinada a tipografia da **Hero Section** para suportar frases de efeito mais longas sem quebrar o layout.
+- **Personagens**:
+  - Refatorada a seção de personagens para incluir Lore detalhada e seleção interativa.
+
+### Corrigido
+
+- **Hero Typography**: Ajustado tamanho de fonte (`text-4xl` a `text-6xl`) para evitar sobreposição de textos longos.
+- **Navbar**: Substituído texto CSS por imagem de alta qualidade para garantir fidelidade à marca.
+
+## [Não Lançado] - 2026-01-18
+
+### Refinado (Eventos do Caos)
+
+- **Ira (Duelo)**:
+  - Implementada nova mecânica de Duelo: Seleção de 2 oponentes -> Duelo -> Punição Mútuo/Extra.
+  - Interface dedicada "VS" com avatares grandes.
+- **Luxúria (Traição)**:
+  - Adicionado botão explícito "Trair (Quebrar Pacto)" para parceiros vinculados.
+  - Implementada punição mútua (10 Dano) ao trair.
+- **Visualização & UI**:
+  - **Cartas do Caos**: Agora exibem Título e Ícone corretamente no cartão (antes só mostravam descrição).
+  - **Header do Jogo**:
+    - Lista de Eventos Ativos agora é compacta e rolável (horizontal scroll) para evitar poluição visual.
+    - Avatares "Anterior" e "Próximo" agora visíveis no Mobile (versão compacta).
+  - **Privacidade**: Interações do Caos agora aparecem estritamente para o jogador da vez.
+  - **Power-Ups**: Ocultos durante Eventos do Caos para evitar conflitos.
+
+### Corrigido
+
+- **Botões "Fantasmas"**: Corrigido bug onde botões de admin/interação apareciam para observadores.
+
+## [Não Lançado] - 2026-01-17
+
+### Corrigido (Eventos do Caos)
+
+- **Gula (Banquete)**:
+  - Corrigido travamento por erro de leitura de lista de jogadores (`sala.jogadores` fix).
+  - Implementada votação funcional (Safety vs Risk) e Coin Flip.
+- **Luxúria (Pacto)**:
+  - Corrigido bug onde o jogo travava após selecionar o parceiro (falta de `passarVez`).
+  - Corrigido erro de "Habilidade Desconhecida" (`parceiro_luxuria`).
+  - Criado evento dinamicamente caso não exista na lista de `activeEvents`.
+- **Runtime Errors**:
+  - Adicionadas proteções contra crashes em `GameHeader` (nome do evento) e `ChaosEventOverlay`.
+- **Timer**:
+  - Desativada penalidade padrão de tempo para eventos do Caos (evita "Aceitou Penalidade" indesejado).
+
+## [Não Lançado] - 2026-01-14
+
+### Adicionado
+
+- **Sistema de Eventos do Caos (7 Pecados Capitais)**:
+  - **Gula**: Botão "Servir Banquete" (Dano global).
+  - **Ira**: Mecânica de Duelo com seleção de alvo.
+  - **Luxúria**: Vínculo de Alma (Dano compartilhado).
+  - **Preguiça**: Slow Mode (+Tempo) e opção de Pular turnos.
+  - **Orgulho**: Ditador com poder de Multar.
+  - **Ganância**: Blitz Mode (Timer reduzido).
+  - **Inveja**: Mascaramento da UI (Ranking oculto).
+- **Interatividade Específica**:
+  - Removido fluxo genérico de "Admin Confirma" para eventos do Caos.
+  - Jogador ativo (ou Host) agora controla botões específicos (ex: "Servir Banquete", "Desafiar para Duelo").
+
+### Corrigido
+
+- **Race Condition**: Corrigido bug onde novos eventos eram sobrescritos ao passar a vez (`useGameActions`).
+- **Luxúria**: Corrigido bug que permitia auto-seleção de parceiro.
+- **Reset de Jogo**: Caos agora é limpo corretamente ao reiniciar a partida.
+- **UI**: Corrigido crash ao tentar renderizar botões de Caos sem evento ativo.
+
 ## [Não Lançado] - 2026-01-10
 
 ### Adicionado
@@ -135,7 +233,6 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 ### Refatorado
 
 - **Sistema de Som (`useSounds`)**:
-
   - Implementado controle genérico de música de fundo (`toggleMusic`).
   - Sincronização de estado entre componentes (`playingBgMusic`).
   - Botão de volume na tela de Jogo agora controla independentemente a música da partida.
